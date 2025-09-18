@@ -27,6 +27,7 @@ export default function EventsManager({ onClose }: EventsManagerProps) {
   const [filterType, setFilterType] = useState<string>('all');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [showTestModal, setShowTestModal] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -153,6 +154,9 @@ export default function EventsManager({ onClose }: EventsManagerProps) {
     });
   };
 
+  // Debug logging
+  console.log('EventsManager render - showAddModal:', showAddModal, 'editingEvent:', editingEvent);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -161,13 +165,28 @@ export default function EventsManager({ onClose }: EventsManagerProps) {
           <h2 className="text-2xl font-bold text-gray-900">Events Management</h2>
           <p className="text-gray-600">Manage UFA events and activities</p>
         </div>
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors flex items-center space-x-2"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add Event</span>
-        </button>
+        <div className="flex space-x-2">
+          <button
+            onClick={() => {
+              console.log('Add Event button clicked');
+              setShowAddModal(true);
+              console.log('showAddModal set to true');
+            }}
+            className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors flex items-center space-x-2"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Event</span>
+          </button>
+          <button
+            onClick={() => {
+              console.log('Test Modal button clicked');
+              setShowTestModal(true);
+            }}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Test Modal
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -309,7 +328,7 @@ export default function EventsManager({ onClose }: EventsManagerProps) {
 
       {/* Add/Edit Event Modal */}
       {(showAddModal || editingEvent) && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" style={{zIndex: 9999}}>
           <div className="bg-white rounded-xl shadow-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               {editingEvent ? 'Edit Event' : 'Add New Event'}
@@ -436,6 +455,22 @@ export default function EventsManager({ onClose }: EventsManagerProps) {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Test Modal */}
+      {showTestModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" style={{zIndex: 9999}}>
+          <div className="bg-white rounded-xl shadow-xl p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Test Modal</h3>
+            <p className="text-gray-600 mb-4">This is a test modal to check if modals are working.</p>
+            <button
+              onClick={() => setShowTestModal(false)}
+              className="w-full px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}

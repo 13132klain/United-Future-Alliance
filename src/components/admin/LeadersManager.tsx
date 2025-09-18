@@ -175,7 +175,11 @@ export default function LeadersManager({ onClose }: LeadersManagerProps) {
           <p className="text-gray-600">Manage UFA leadership team and representatives</p>
         </div>
         <button
-          onClick={() => setShowAddModal(true)}
+          onClick={() => {
+            console.log('Add Leader button clicked');
+            setShowAddModal(true);
+            console.log('showAddModal set to true');
+          }}
           className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors flex items-center space-x-2"
         >
           <Plus className="w-4 h-4" />
@@ -331,7 +335,7 @@ export default function LeadersManager({ onClose }: LeadersManagerProps) {
 
       {/* Add/Edit Leader Modal */}
       {(showAddModal || editingLeader) && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" style={{zIndex: 9999}}>
           <div className="bg-white rounded-xl shadow-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               {editingLeader ? 'Edit Leader' : 'Add New Leader'}
