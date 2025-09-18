@@ -127,9 +127,21 @@ export const eventsService = {
     // Simulate real-time updates by calling callback immediately
     callback([...mockEvents].slice(0, count));
     
+    // Create a wrapper callback that slices the events
+    const wrappedCallback = (events: Event[]) => {
+      callback(events.slice(0, count));
+    };
+    
+    // Store wrapped callback for future updates
+    eventSubscribers.push(wrappedCallback);
+    
     // Return unsubscribe function
     return () => {
       console.log('Unsubscribing from mock upcoming events');
+      const index = eventSubscribers.indexOf(wrappedCallback);
+      if (index > -1) {
+        eventSubscribers.splice(index, 1);
+      }
     };
   }
 };
@@ -203,9 +215,21 @@ export const newsService = {
     // Simulate real-time updates by calling callback immediately
     callback([...mockNews].slice(0, count));
     
+    // Create a wrapper callback that slices the news
+    const wrappedCallback = (news: NewsItem[]) => {
+      callback(news.slice(0, count));
+    };
+    
+    // Store wrapped callback for future updates
+    newsSubscribers.push(wrappedCallback);
+    
     // Return unsubscribe function
     return () => {
       console.log('Unsubscribing from mock latest news');
+      const index = newsSubscribers.indexOf(wrappedCallback);
+      if (index > -1) {
+        newsSubscribers.splice(index, 1);
+      }
     };
   }
 };
