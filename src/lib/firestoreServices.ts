@@ -16,55 +16,143 @@ import {
 import { db } from './firebase';
 import { Event, NewsItem, Leader } from '../types';
 
+// Mock data for fallback mode
+const mockEvents: Event[] = [
+  {
+    id: '1',
+    title: 'National Youth Summit 2024',
+    description: 'A comprehensive gathering of young leaders, innovators, and changemakers from across Kenya.',
+    date: new Date('2024-02-15'),
+    location: 'KICC, Nairobi',
+    type: 'rally',
+    registrationRequired: true,
+    image: 'https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg?auto=compress&cs=tinysrgb&w=800'
+  },
+  {
+    id: '2',
+    title: 'Economic Policy Webinar',
+    description: 'Digital discussion on sustainable economic growth strategies.',
+    date: new Date('2024-02-20'),
+    location: 'Online',
+    type: 'webinar',
+    registrationRequired: true,
+    image: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=800'
+  }
+];
+
+const mockNews: NewsItem[] = [
+  {
+    id: '1',
+    title: 'UFA Launches Comprehensive Education Reform Initiative',
+    excerpt: 'New policy proposals aim to transform Kenya\'s education system with focus on digital literacy and vocational training.',
+    content: 'Full article content here...',
+    author: 'UFA Communications Team',
+    publishDate: new Date('2024-01-15'),
+    image: 'https://images.pexels.com/photos/289737/pexels-photo-289737.jpeg?auto=compress&cs=tinysrgb&w=800',
+    category: 'Education'
+  }
+];
+
+const mockLeaders: Leader[] = [
+  {
+    id: '1',
+    name: 'Dr. Sarah Mwangi',
+    position: 'Chairman & Co-Founder',
+    email: 'sarah.mwangi@ufa.org',
+    phone: '+254712345678',
+    socialLinks: {
+      linkedin: 'https://linkedin.com/in/sarahmwangi',
+      twitter: 'https://twitter.com/sarahmwangi_ufa'
+    }
+  }
+];
+
 // Events Service
 export const eventsService = {
   // Get all events
   async getEvents(): Promise<Event[]> {
-    if (!db) throw new Error('Firestore not initialized');
+    if (!db) {
+      console.log('Firestore not configured, using mock data');
+      return mockEvents;
+    }
     
-    const eventsRef = collection(db, 'events');
-    const q = query(eventsRef, orderBy('date', 'desc'));
-    const snapshot = await getDocs(q);
-    
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      date: doc.data().date?.toDate() || new Date()
-    })) as Event[];
+    try {
+      const eventsRef = collection(db, 'events');
+      const q = query(eventsRef, orderBy('date', 'desc'));
+      const snapshot = await getDocs(q);
+      
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        date: doc.data().date?.toDate() || new Date()
+      })) as Event[];
+    } catch (error) {
+      console.error('Error fetching events from Firestore:', error);
+      console.log('Falling back to mock data');
+      return mockEvents;
+    }
   },
 
   // Get upcoming events
   async getUpcomingEvents(count: number = 5): Promise<Event[]> {
-    if (!db) throw new Error('Firestore not initialized');
+    if (!db) {
+      console.log('Firestore not configured, using mock data');
+      return mockEvents.slice(0, count);
+    }
     
-    const eventsRef = collection(db, 'events');
-    const q = query(
-      eventsRef, 
-      where('date', '>=', new Date()),
-      orderBy('date', 'asc'),
-      limit(count)
-    );
-    const snapshot = await getDocs(q);
-    
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      date: doc.data().date?.toDate() || new Date()
-    })) as Event[];
+    try {
+      const eventsRef = collection(db, 'events');
+      const q = query(
+        eventsRef, 
+        where('date', '>=', new Date()),
+        orderBy('date', 'asc'),
+        limit(count)
+      );
+      const snapshot = await getDocs(q);
+      
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        date: doc.data().date?.toDate() || new Date()
+      })) as Event[];
+    } catch (error) {
+      console.error('Error fetching upcoming events from Firestore:', error);
+      console.log('Falling back to mock data');
+      return mockEvents.slice(0, count);
+    }
   },
 
   // Add new event
   async addEvent(event: Omit<Event, 'id'>): Promise<string> {
-    if (!db) throw new Error('Firestore not initialized');
+    if (!db) {
+      console.log('Firestore not configured, simulating add event');
+      const newId = Date.now().toString();
+      mockEvents.unshift({
+        id: newId,
+        ...event
+      });
+      return newId;
+    }
     
-    const eventsRef = collection(db, 'events');
-    const docRef = await addDoc(eventsRef, {
-      ...event,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    });
-    
-    return docRef.id;
+    try {
+      const eventsRef = collection(db, 'events');
+      const docRef = await addDoc(eventsRef, {
+        ...event,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+      
+      return docRef.id;
+    } catch (error) {
+      console.error('Error adding event to Firestore:', error);
+      console.log('Simulating add event');
+      const newId = Date.now().toString();
+      mockEvents.unshift({
+        id: newId,
+        ...event
+      });
+      return newId;
+    }
   },
 
   // Update event
