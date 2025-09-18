@@ -3,12 +3,13 @@ import {
   onAuthStateChanged, 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
+  signInWithPopup,
   signOut, 
   updateProfile,
   User as FirebaseUser
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { auth, db, isFirebaseConfigured } from '../lib/firebase';
+import { auth, db, googleProvider, isFirebaseConfigured } from '../lib/firebase';
 import { User } from '../types';
 
 interface AuthContextType {
@@ -17,6 +18,7 @@ interface AuthContextType {
   error: string | null;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   logout: () => void;
   clearError: () => void;
 }
@@ -190,6 +192,43 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const signInWithGoogle = async (): Promise<void> => {
+    setError(null);
+    setLoading(true);
+
+    try {
+      if (!isFirebaseConfigured() || !auth) {
+        throw new Error('Firebase authentication is not configured. Please check your setup.');
+      }
+
+      // Sign in with Google popup
+      const result = await signInWithPopup(auth, googleProvider);
+      
+      // User state will be updated by the onAuthStateChanged listener
+      console.log('✅ Google sign-in successful:', result.user.email);
+    } catch (error: any) {
+      console.error('❌ Google sign-in error:', error);
+      
+      // Handle specific Google auth errors
+      let errorMessage = 'Failed to sign in with Google. Please try again.';
+      
+      if (error.code === 'auth/popup-closed-by-user') {
+        errorMessage = 'Sign-in was cancelled. Please try again.';
+      } else if (error.code === 'auth/popup-blocked') {
+        errorMessage = 'Popup was blocked by your browser. Please allow popups and try again.';
+      } else if (error.code === 'auth/account-exists-with-different-credential') {
+        errorMessage = 'An account already exists with this email using a different sign-in method.';
+      } else if (error.code === 'auth/operation-not-allowed') {
+        errorMessage = 'Google sign-in is not enabled. Please contact support.';
+      }
+      
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = async (): Promise<void> => {
     try {
       if (isFirebaseConfigured() && auth) {
@@ -217,6 +256,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     error,
     signIn,
     signUp,
+    signInWithGoogle,
     logout,
     clearError,
   };

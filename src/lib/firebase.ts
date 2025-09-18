@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, connectAuthEmulator } from 'firebase/auth';
+import { getAuth, connectAuthEmulator, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 import { getStorage, connectStorageEmulator } from 'firebase/storage';
 
@@ -86,8 +86,14 @@ if (isFirebaseConfigured()) {
   ]);
 }
 
+// Create Google Auth Provider
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
+  prompt: 'select_account'
+});
+
 // Export Firebase services
-export { app, auth, db, storage, isFirebaseConfigured };
+export { app, auth, db, storage, googleProvider, isFirebaseConfigured };
 
 // Export Firebase types for convenience
 export type { User as FirebaseUser } from 'firebase/auth';

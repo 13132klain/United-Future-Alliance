@@ -17,6 +17,11 @@
    - Click on "Email/Password"
    - Toggle "Enable" to ON
    - Click "Save"
+5. Enable "Google" provider:
+   - Click on "Google"
+   - Toggle "Enable" to ON
+   - Select your project support email
+   - Click "Save"
 
 ## Step 3: Get Firebase Configuration
 
@@ -98,9 +103,10 @@ service cloud.firestore {
 ## Step 7: Test Your Setup
 
 1. Start your development server: `npm run dev`
-2. Go to your app and try to register a new account
-3. Check the Firebase Console > Authentication to see if the user was created
-4. Try logging in with the created account
+2. Go to your app and try to register a new account with email/password
+3. Try signing in with Google using the "Continue with Google" button
+4. Check the Firebase Console > Authentication to see if the users were created
+5. Try logging in with both methods
 
 ## Troubleshooting
 
