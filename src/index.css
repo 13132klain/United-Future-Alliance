@@ -1,0 +1,536 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom animations for hero section */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+/* Animation classes */
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.8s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.8s ease-out forwards;
+}
+
+.animate-fade-in-right {
+  animation: fade-in-right 0.8s ease-out forwards;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
+
+.animate-spin-reverse {
+  animation: spin-reverse 15s linear infinite;
+}
+
+/* Delay classes */
+.delay-300 {
+  animation-delay: 0.3s;
+}
+
+.delay-500 {
+  animation-delay: 0.5s;
+}
+
+.delay-700 {
+  animation-delay: 0.7s;
+}
+
+.delay-1000 {
+  animation-delay: 1s;
+}
+
+/* Initially hide animated elements */
+.animate-fade-in-up,
+.animate-slide-in-left,
+.animate-slide-in-right,
+.animate-fade-in-right {
+  opacity: 0;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #10b981;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #059669;
+}
+
+/* Ray scale effect for cards */
+@keyframes ray-scale {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  50% {
+    transform: scale(1.25);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+  100% {
+    transform: scale(1.3);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Enhanced hover effects for cards */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: scale(1.25) translateY(-5px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  z-index: 10;
+}
+
+/* Glow effect for cards */
+.card-glow:hover {
+  filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.4));
+}
+
+/* Image loading and fallback effects */
+.card-image {
+  transition: all 0.3s ease;
+}
+
+.card-image:hover {
+  transform: scale(1.05);
+}
+
+/* Image loading animation */
+@keyframes image-loading {
+  0% {
+    opacity: 0;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.image-loaded {
+  animation: image-loading 0.5s ease-out;
+}
+
+/* Enhanced card hover with image effects */
+.card-hover:hover .card-image {
+  transform: scale(1.1);
+  filter: brightness(1.1) contrast(1.1);
+}
+
+/* Stacked card effects */
+.stacked-card {
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center center;
+}
+
+/* Grayscale effect */
+.grayscale {
+  filter: grayscale(100%);
+  transition: filter 0.3s ease;
+}
+
+/* Hover effects for stacked cards */
+.stacked-card:hover {
+  filter: grayscale(0%) brightness(1.1);
+  transform: scale(1.1) translateY(-10px);
+  z-index: 20 !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+}
+
+.stacked-card:hover .card-image {
+  filter: grayscale(0%) brightness(1.2) contrast(1.1);
+}
+
+/* Container hover effect to disperse cards */
+.stacked-cards-container:hover .stacked-card:nth-child(1) {
+  transform: translate(-80px, -60px) scale(1.1) rotate(-15deg);
+  z-index: 10;
+}
+
+.stacked-cards-container:hover .stacked-card:nth-child(2) {
+  transform: translate(80px, -60px) scale(1.1) rotate(15deg);
+  z-index: 10;
+}
+
+.stacked-cards-container:hover .stacked-card:nth-child(3) {
+  transform: translate(-100px, 0px) scale(1.1) rotate(-10deg);
+  z-index: 10;
+}
+
+.stacked-cards-container:hover .stacked-card:nth-child(4) {
+  transform: translate(100px, 0px) scale(1.1) rotate(10deg);
+  z-index: 10;
+}
+
+.stacked-cards-container:hover .stacked-card:nth-child(5) {
+  transform: translate(-80px, 60px) scale(1.1) rotate(-5deg);
+  z-index: 10;
+}
+
+.stacked-cards-container:hover .stacked-card:nth-child(6) {
+  transform: translate(80px, 60px) scale(1.1) rotate(5deg);
+  z-index: 10;
+}
+
+/* Individual card hover effects */
+.stacked-card:nth-child(1):hover {
+  transform: translate(-80px, -60px) scale(1.3) rotate(-15deg) !important;
+  filter: grayscale(0%) brightness(1.3);
+}
+
+.stacked-card:nth-child(2):hover {
+  transform: translate(80px, -60px) scale(1.3) rotate(15deg) !important;
+  filter: grayscale(0%) brightness(1.3);
+}
+
+.stacked-card:nth-child(3):hover {
+  transform: translate(-100px, 0px) scale(1.3) rotate(-10deg) !important;
+  filter: grayscale(0%) brightness(1.3);
+}
+
+.stacked-card:nth-child(4):hover {
+  transform: translate(100px, 0px) scale(1.3) rotate(10deg) !important;
+  filter: grayscale(0%) brightness(1.3);
+}
+
+.stacked-card:nth-child(5):hover {
+  transform: translate(-80px, 60px) scale(1.3) rotate(-5deg) !important;
+  filter: grayscale(0%) brightness(1.3);
+}
+
+.stacked-card:nth-child(6):hover {
+  transform: translate(80px, 60px) scale(1.3) rotate(5deg) !important;
+  filter: grayscale(0%) brightness(1.3);
+}
+
+/* Mobile responsive adjustments for stacked cards */
+@media (max-width: 640px) {
+  /* Reduce disperse distances on mobile */
+  .stacked-cards-container:hover .stacked-card:nth-child(1) {
+    transform: translate(-40px, -30px) scale(1.1) rotate(-15deg);
+  }
+  
+  .stacked-cards-container:hover .stacked-card:nth-child(2) {
+    transform: translate(40px, -30px) scale(1.1) rotate(15deg);
+  }
+  
+  .stacked-cards-container:hover .stacked-card:nth-child(3) {
+    transform: translate(-50px, 0px) scale(1.1) rotate(-10deg);
+  }
+  
+  .stacked-cards-container:hover .stacked-card:nth-child(4) {
+    transform: translate(50px, 0px) scale(1.1) rotate(10deg);
+  }
+  
+  .stacked-cards-container:hover .stacked-card:nth-child(5) {
+    transform: translate(-40px, 30px) scale(1.1) rotate(-5deg);
+  }
+  
+  .stacked-cards-container:hover .stacked-card:nth-child(6) {
+    transform: translate(40px, 30px) scale(1.1) rotate(5deg);
+  }
+  
+  /* Individual card hover effects on mobile */
+  .stacked-card:nth-child(1):hover {
+    transform: translate(-40px, -30px) scale(1.2) rotate(-15deg) !important;
+  }
+  
+  .stacked-card:nth-child(2):hover {
+    transform: translate(40px, -30px) scale(1.2) rotate(15deg) !important;
+  }
+  
+  .stacked-card:nth-child(3):hover {
+    transform: translate(-50px, 0px) scale(1.2) rotate(-10deg) !important;
+  }
+  
+  .stacked-card:nth-child(4):hover {
+    transform: translate(50px, 0px) scale(1.2) rotate(10deg) !important;
+  }
+  
+  .stacked-card:nth-child(5):hover {
+    transform: translate(-40px, 30px) scale(1.2) rotate(-5deg) !important;
+  }
+  
+  .stacked-card:nth-child(6):hover {
+    transform: translate(40px, 30px) scale(1.2) rotate(5deg) !important;
+  }
+}
+
+/* Medium screen adjustments */
+@media (min-width: 641px) and (max-width: 768px) {
+  .stacked-cards-container:hover .stacked-card:nth-child(1) {
+    transform: translate(-60px, -45px) scale(1.1) rotate(-15deg);
+  }
+  
+  .stacked-cards-container:hover .stacked-card:nth-child(2) {
+    transform: translate(60px, -45px) scale(1.1) rotate(15deg);
+  }
+  
+  .stacked-cards-container:hover .stacked-card:nth-child(3) {
+    transform: translate(-75px, 0px) scale(1.1) rotate(-10deg);
+  }
+  
+  .stacked-cards-container:hover .stacked-card:nth-child(4) {
+    transform: translate(75px, 0px) scale(1.1) rotate(10deg);
+  }
+  
+  .stacked-cards-container:hover .stacked-card:nth-child(5) {
+    transform: translate(-60px, 45px) scale(1.1) rotate(-5deg);
+  }
+  
+  .stacked-cards-container:hover .stacked-card:nth-child(6) {
+    transform: translate(60px, 45px) scale(1.1) rotate(5deg);
+  }
+}
+
+/* Vision image hover effects */
+.vision-image-hover {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.vision-image-hover:hover {
+  filter: grayscale(100%) brightness(0.8);
+  transform: scale(1.05);
+}
+
+/* Enhanced grayscale effect for vision section */
+.group:hover .group-hover\:grayscale {
+  filter: grayscale(100%) brightness(0.9) contrast(1.1);
+}
+
+/* News section enhancements */
+.news-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.news-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* News image hover effects */
+.news-image {
+  transition: transform 0.5s ease;
+}
+
+.news-card:hover .news-image {
+  transform: scale(1.1);
+}
+
+/* Newsletter subscription animation */
+@keyframes newsletter-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+  }
+}
+
+.newsletter-card {
+  animation: newsletter-pulse 2s infinite;
+}
+
+/* Enhanced button hover effects */
+.news-read-more {
+  position: relative;
+  overflow: hidden;
+}
+
+.news-read-more::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.news-read-more:hover::before {
+  left: 100%;
+}
+
+/* Events section enhancements */
+.event-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.event-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Event date display animation */
+@keyframes date-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.event-date {
+  animation: date-pulse 2s infinite;
+}
+
+/* Event button hover effects */
+.event-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.event-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.event-button:hover::before {
+  left: 100%;
+}
+
+/* Event type badge animations */
+.event-type-badge {
+  transition: all 0.3s ease;
+}
+
+.event-card:hover .event-type-badge {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* User menu animations */
+@keyframes slide-in-from-top {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation: slide-in-from-top 0.2s ease-out;
+}
+
+.slide-in-from-top-2 {
+  animation: slide-in-from-top 0.2s ease-out;
+}
+
+/* User profile hover effects */
+.user-profile-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.user-profile-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Online indicator pulse */
+@keyframes pulse-green {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.online-indicator {
+  animation: pulse-green 2s infinite;
+}
