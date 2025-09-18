@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NewsItem } from '../../types';
+import { newsService } from '../../lib/firestoreServices';
 import { 
   Plus, 
   Search, 
@@ -11,7 +12,8 @@ import {
   Newspaper,
   Calendar,
   User,
-  Tag
+  Tag,
+  Loader2
 } from 'lucide-react';
 
 interface NewsManagerProps {
@@ -19,42 +21,30 @@ interface NewsManagerProps {
 }
 
 export default function NewsManager({ onClose }: NewsManagerProps) {
-  const [newsItems, setNewsItems] = useState<NewsItem[]>([
-    {
-      id: '1',
-      title: 'UFA Launches Comprehensive Education Reform Initiative',
-      excerpt: 'New policy proposals aim to transform Kenya\'s education system with focus on digital literacy and vocational training.',
-      content: 'Full article content here...',
-      author: 'UFA Communications Team',
-      publishDate: new Date('2024-01-15'),
-      image: 'https://images.pexels.com/photos/289737/pexels-photo-289737.jpeg?auto=compress&cs=tinysrgb&w=800',
-      category: 'Education'
-    },
-    {
-      id: '2',
-      title: 'Community Town Halls Begin Across All Counties',
-      excerpt: 'UFA leaders begin nationwide listening tour to engage directly with citizens about local challenges and solutions.',
-      content: 'Full article content here...',
-      author: 'Field Operations',
-      publishDate: new Date('2024-01-12'),
-      image: 'https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg?auto=compress&cs=tinysrgb&w=800',
-      category: 'Community'
-    },
-    {
-      id: '3',
-      title: 'Youth Employment Program Reaches 10,000 Participants',
-      excerpt: 'UFA\'s flagship youth employment initiative achieves major milestone, connecting young Kenyans with sustainable career opportunities.',
-      content: 'Full article content here...',
-      author: 'Youth Affairs Department',
-      publishDate: new Date('2024-01-10'),
-      image: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=800',
-      category: 'Youth'
-    }
-  ]);
-
+  const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingNews, setEditingNews] = useState<NewsItem | null>(null);
+  const [formData, setFormData] = useState({
+    title: '',
+    excerpt: '',
+    content: '',
+    author: '',
+    category: 'Education',
+    image: ''
+  });
+
+  // Load news from Firestore
+  useEffect(() => {
+    const unsubscribe = newsService.subscribeToNews((newsData) => {
+      setNewsItems(newsData);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const filteredNews = newsItems.filter(news => {
     const matchesSearch = news.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -80,6 +70,82 @@ export default function NewsManager({ onClose }: NewsManagerProps) {
       month: 'short',
       day: 'numeric'
     }).format(date);
+  };
+
+  const handleAddNews = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const newsData = {
+        title: formData.title,
+        excerpt: formData.excerpt,
+        content: formData.content,
+        author: formData.author,
+        category: formData.category,
+        image: formData.image || 'https://images.pexels.com/photos/289737/pexels-photo-289737.jpeg?auto=compress&cs=tinysrgb&w=800',
+        publishDate: new Date()
+      };
+
+      await newsService.addNews(newsData);
+      setShowAddModal(false);
+      resetForm();
+    } catch (error) {
+      console.error('Error adding news:', error);
+    }
+  };
+
+  const handleEditNews = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingNews) return;
+
+    try {
+      const newsData = {
+        title: formData.title,
+        excerpt: formData.excerpt,
+        content: formData.content,
+        author: formData.author,
+        category: formData.category,
+        image: formData.image || 'https://images.pexels.com/photos/289737/pexels-photo-289737.jpeg?auto=compress&cs=tinysrgb&w=800'
+      };
+
+      await newsService.updateNews(editingNews.id, newsData);
+      setEditingNews(null);
+      resetForm();
+    } catch (error) {
+      console.error('Error updating news:', error);
+    }
+  };
+
+  const handleDeleteNews = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this article?')) {
+      try {
+        await newsService.deleteNews(id);
+      } catch (error) {
+        console.error('Error deleting news:', error);
+      }
+    }
+  };
+
+  const openEditModal = (news: NewsItem) => {
+    setEditingNews(news);
+    setFormData({
+      title: news.title,
+      excerpt: news.excerpt,
+      content: news.content,
+      author: news.author,
+      category: news.category,
+      image: news.image
+    });
+  };
+
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      excerpt: '',
+      content: '',
+      author: '',
+      category: 'Education',
+      image: ''
+    });
   };
 
   return (
@@ -132,9 +198,18 @@ export default function NewsManager({ onClose }: NewsManagerProps) {
         </div>
       </div>
 
+      {/* Loading State */}
+      {loading && (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+          <span className="ml-2 text-gray-600">Loading news...</span>
+        </div>
+      )}
+
       {/* News Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {filteredNews.map((news) => (
+      {!loading && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          {filteredNews.map((news) => (
           <div key={news.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
             {/* News Image */}
             <div className="h-48 bg-gray-200 relative">
@@ -177,10 +252,16 @@ export default function NewsManager({ onClose }: NewsManagerProps) {
                   <button className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors">
                     <Eye className="w-4 h-4" />
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                  <button 
+                    onClick={() => openEditModal(news)}
+                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  >
                     <Edit className="w-4 h-4" />
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                  <button 
+                    onClick={() => handleDeleteNews(news.id)}
+                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -191,7 +272,8 @@ export default function NewsManager({ onClose }: NewsManagerProps) {
             </div>
           </div>
         ))}
-      </div>
+        </div>
+      )}
 
       {/* Empty State */}
       {filteredNews.length === 0 && (
@@ -213,26 +295,123 @@ export default function NewsManager({ onClose }: NewsManagerProps) {
         </div>
       )}
 
-      {/* Add Article Modal Placeholder */}
-      {showAddModal && (
+      {/* Add/Edit Article Modal */}
+      {(showAddModal || editingNews) && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl p-6 max-w-md w-full">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Add New Article</h3>
-            <p className="text-gray-600 mb-4">Article creation form will be implemented here.</p>
-            <div className="flex space-x-3">
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-              >
-                Save Article
-              </button>
-            </div>
+          <div className="bg-white rounded-xl shadow-xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              {editingNews ? 'Edit Article' : 'Add New Article'}
+            </h3>
+            
+            <form onSubmit={editingNews ? handleEditNews : handleAddNews} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Article Title *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.title}
+                  onChange={(e) => setFormData({...formData, title: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="Enter article title"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Excerpt *
+                </label>
+                <textarea
+                  required
+                  rows={2}
+                  value={formData.excerpt}
+                  onChange={(e) => setFormData({...formData, excerpt: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="Enter article excerpt"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Full Content *
+                </label>
+                <textarea
+                  required
+                  rows={6}
+                  value={formData.content}
+                  onChange={(e) => setFormData({...formData, content: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="Enter full article content"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Author *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.author}
+                    onChange={(e) => setFormData({...formData, author: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    placeholder="Enter author name"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Category *
+                  </label>
+                  <select
+                    required
+                    value={formData.category}
+                    onChange={(e) => setFormData({...formData, category: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  >
+                    <option value="Education">Education</option>
+                    <option value="Community">Community</option>
+                    <option value="Youth">Youth</option>
+                    <option value="Policy">Policy</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Image URL
+                </label>
+                <input
+                  type="url"
+                  value={formData.image}
+                  onChange={(e) => setFormData({...formData, image: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="Enter image URL (optional)"
+                />
+              </div>
+
+              <div className="flex space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddModal(false);
+                    setEditingNews(null);
+                    resetForm();
+                  }}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                >
+                  {editingNews ? 'Update Article' : 'Create Article'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

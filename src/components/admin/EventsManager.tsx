@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Event } from '../../types';
+import { eventsService } from '../../lib/firestoreServices';
 import { 
   Plus, 
   Search, 
@@ -11,7 +12,8 @@ import {
   Calendar,
   MapPin,
   Users,
-  Clock
+  Clock,
+  Loader2
 } from 'lucide-react';
 
 interface EventsManagerProps {
@@ -19,42 +21,31 @@ interface EventsManagerProps {
 }
 
 export default function EventsManager({ onClose }: EventsManagerProps) {
-  const [events, setEvents] = useState<Event[]>([
-    {
-      id: '1',
-      title: 'National Youth Summit 2024',
-      description: 'A comprehensive gathering of young leaders, innovators, and changemakers from across Kenya.',
-      date: new Date('2024-02-15'),
-      location: 'KICC, Nairobi',
-      type: 'rally',
-      registrationRequired: true,
-      image: 'https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg?auto=compress&cs=tinysrgb&w=800'
-    },
-    {
-      id: '2',
-      title: 'Economic Policy Webinar',
-      description: 'Digital discussion on sustainable economic growth strategies.',
-      date: new Date('2024-02-20'),
-      location: 'Online',
-      type: 'webinar',
-      registrationRequired: true,
-      image: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=800'
-    },
-    {
-      id: '3',
-      title: 'Community Town Hall - Mombasa',
-      description: 'Open forum for residents of Mombasa County to discuss local issues.',
-      date: new Date('2024-02-25'),
-      location: 'Mombasa Cultural Centre',
-      type: 'meeting',
-      registrationRequired: false,
-      image: 'https://images.pexels.com/photos/289737/pexels-photo-289737.jpeg?auto=compress&cs=tinysrgb&w=800'
-    }
-  ]);
-
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    date: '',
+    location: '',
+    type: 'rally',
+    registrationRequired: false,
+    image: ''
+  });
+
+  // Load events from Firestore
+  useEffect(() => {
+    const unsubscribe = eventsService.subscribeToEvents((eventsData) => {
+      setEvents(eventsData);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const filteredEvents = events.filter(event => {
     const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -81,6 +72,85 @@ export default function EventsManager({ onClose }: EventsManagerProps) {
       hour: '2-digit',
       minute: '2-digit'
     }).format(date);
+  };
+
+  const handleAddEvent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const eventData = {
+        title: formData.title,
+        description: formData.description,
+        date: new Date(formData.date),
+        location: formData.location,
+        type: formData.type as 'rally' | 'webinar' | 'meeting' | 'fundraiser',
+        registrationRequired: formData.registrationRequired,
+        image: formData.image || 'https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg?auto=compress&cs=tinysrgb&w=800'
+      };
+
+      await eventsService.addEvent(eventData);
+      setShowAddModal(false);
+      resetForm();
+    } catch (error) {
+      console.error('Error adding event:', error);
+    }
+  };
+
+  const handleEditEvent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingEvent) return;
+
+    try {
+      const eventData = {
+        title: formData.title,
+        description: formData.description,
+        date: new Date(formData.date),
+        location: formData.location,
+        type: formData.type as 'rally' | 'webinar' | 'meeting' | 'fundraiser',
+        registrationRequired: formData.registrationRequired,
+        image: formData.image || 'https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg?auto=compress&cs=tinysrgb&w=800'
+      };
+
+      await eventsService.updateEvent(editingEvent.id, eventData);
+      setEditingEvent(null);
+      resetForm();
+    } catch (error) {
+      console.error('Error updating event:', error);
+    }
+  };
+
+  const handleDeleteEvent = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this event?')) {
+      try {
+        await eventsService.deleteEvent(id);
+      } catch (error) {
+        console.error('Error deleting event:', error);
+      }
+    }
+  };
+
+  const openEditModal = (event: Event) => {
+    setEditingEvent(event);
+    setFormData({
+      title: event.title,
+      description: event.description,
+      date: event.date.toISOString().slice(0, 16),
+      location: event.location,
+      type: event.type,
+      registrationRequired: event.registrationRequired,
+      image: event.image
+    });
+  };
+
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      description: '',
+      date: '',
+      location: '',
+      type: 'rally',
+      registrationRequired: false,
+      image: ''
+    });
   };
 
   return (
@@ -133,9 +203,18 @@ export default function EventsManager({ onClose }: EventsManagerProps) {
         </div>
       </div>
 
+      {/* Loading State */}
+      {loading && (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+          <span className="ml-2 text-gray-600">Loading events...</span>
+        </div>
+      )}
+
       {/* Events Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {filteredEvents.map((event) => (
+      {!loading && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          {filteredEvents.map((event) => (
           <div key={event.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
             {/* Event Image */}
             <div className="h-48 bg-gray-200 relative">
@@ -185,10 +264,16 @@ export default function EventsManager({ onClose }: EventsManagerProps) {
                   <button className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors">
                     <Eye className="w-4 h-4" />
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                  <button 
+                    onClick={() => openEditModal(event)}
+                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  >
                     <Edit className="w-4 h-4" />
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                  <button 
+                    onClick={() => handleDeleteEvent(event.id)}
+                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -199,7 +284,8 @@ export default function EventsManager({ onClose }: EventsManagerProps) {
             </div>
           </div>
         ))}
-      </div>
+        </div>
+      )}
 
       {/* Empty State */}
       {filteredEvents.length === 0 && (
@@ -221,26 +307,135 @@ export default function EventsManager({ onClose }: EventsManagerProps) {
         </div>
       )}
 
-      {/* Add Event Modal Placeholder */}
-      {showAddModal && (
+      {/* Add/Edit Event Modal */}
+      {(showAddModal || editingEvent) && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl p-6 max-w-md w-full">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Add New Event</h3>
-            <p className="text-gray-600 mb-4">Event creation form will be implemented here.</p>
-            <div className="flex space-x-3">
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-              >
-                Save Event
-              </button>
-            </div>
+          <div className="bg-white rounded-xl shadow-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              {editingEvent ? 'Edit Event' : 'Add New Event'}
+            </h3>
+            
+            <form onSubmit={editingEvent ? handleEditEvent : handleAddEvent} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Event Title *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.title}
+                  onChange={(e) => setFormData({...formData, title: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="Enter event title"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description *
+                </label>
+                <textarea
+                  required
+                  rows={3}
+                  value={formData.description}
+                  onChange={(e) => setFormData({...formData, description: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="Enter event description"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Date & Time *
+                  </label>
+                  <input
+                    type="datetime-local"
+                    required
+                    value={formData.date}
+                    onChange={(e) => setFormData({...formData, date: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Event Type *
+                  </label>
+                  <select
+                    required
+                    value={formData.type}
+                    onChange={(e) => setFormData({...formData, type: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  >
+                    <option value="rally">Rally</option>
+                    <option value="webinar">Webinar</option>
+                    <option value="meeting">Meeting</option>
+                    <option value="fundraiser">Fundraiser</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Location *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.location}
+                  onChange={(e) => setFormData({...formData, location: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="Enter event location"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Image URL
+                </label>
+                <input
+                  type="url"
+                  value={formData.image}
+                  onChange={(e) => setFormData({...formData, image: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="Enter image URL (optional)"
+                />
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="registrationRequired"
+                  checked={formData.registrationRequired}
+                  onChange={(e) => setFormData({...formData, registrationRequired: e.target.checked})}
+                  className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
+                />
+                <label htmlFor="registrationRequired" className="ml-2 block text-sm text-gray-700">
+                  Registration Required
+                </label>
+              </div>
+
+              <div className="flex space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddModal(false);
+                    setEditingEvent(null);
+                    resetForm();
+                  }}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                >
+                  {editingEvent ? 'Update Event' : 'Create Event'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
