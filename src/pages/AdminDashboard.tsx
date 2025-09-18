@@ -5,6 +5,7 @@ import EventsManager from '../components/admin/EventsManager';
 import NewsManager from '../components/admin/NewsManager';
 import LeadersManager from '../components/admin/LeadersManager';
 import SettingsManager from '../components/admin/SettingsManager';
+import { eventsService, newsService, leadersService } from '../lib/mockFirestoreService';
 import { 
   LayoutDashboard, 
   Calendar, 
@@ -35,20 +36,53 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState<DashboardTab>('overview');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  // Mock data for demonstration
-  const [stats] = useState({
-    totalEvents: 12,
-    totalNews: 8,
-    totalLeaders: 6,
-    totalUsers: 1247
+  // Real-time data from services
+  const [stats, setStats] = useState({
+    totalEvents: 0,
+    totalNews: 0,
+    totalLeaders: 0,
+    totalUsers: 1247 // This would come from user service in a real app
   });
 
-  const [recentActivity] = useState([
+  const [recentActivity, setRecentActivity] = useState([
     { id: 1, type: 'event', action: 'Created', item: 'Youth Summit 2024', time: '2 hours ago' },
     { id: 2, type: 'news', action: 'Published', item: 'Education Reform Update', time: '4 hours ago' },
     { id: 3, type: 'leader', action: 'Added', item: 'Dr. Sarah Mwangi', time: '1 day ago' },
     { id: 4, type: 'event', action: 'Updated', item: 'Community Town Hall', time: '2 days ago' }
   ]);
+
+  // Set up real-time subscriptions for overview stats
+  useEffect(() => {
+    const unsubscribeEvents = eventsService.subscribeToEvents((events) => {
+      setStats(prev => ({ ...prev, totalEvents: events.length }));
+    });
+
+    const unsubscribeNews = newsService.subscribeToNews((news) => {
+      setStats(prev => ({ ...prev, totalNews: news.length }));
+    });
+
+    const unsubscribeLeaders = leadersService.subscribeToLeaders((leaders) => {
+      setStats(prev => ({ ...prev, totalLeaders: leaders.length }));
+    });
+
+    return () => {
+      unsubscribeEvents();
+      unsubscribeNews();
+      unsubscribeLeaders();
+    };
+  }, []);
+
+  // Function to add recent activity (called by child components)
+  const addRecentActivity = (type: string, action: string, item: string) => {
+    const newActivity = {
+      id: Date.now(),
+      type,
+      action,
+      item,
+      time: 'Just now'
+    };
+    setRecentActivity(prev => [newActivity, ...prev.slice(0, 3)]);
+  };
 
   const sidebarItems = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -175,11 +209,11 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
       case 'overview':
         return renderOverview();
       case 'events':
-        return <EventsManager onClose={() => {}} />;
+        return <EventsManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
       case 'news':
-        return <NewsManager onClose={() => {}} />;
+        return <NewsManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
       case 'leaders':
-        return <LeadersManager onClose={() => {}} />;
+        return <LeadersManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
       case 'settings':
         return <SettingsManager onClose={() => {}} />;
       default:

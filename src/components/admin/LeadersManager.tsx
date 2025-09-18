@@ -18,9 +18,10 @@ import {
 
 interface LeadersManagerProps {
   onClose: () => void;
+  onActivityUpdate?: (type: string, action: string, item: string) => void;
 }
 
-export default function LeadersManager({ onClose }: LeadersManagerProps) {
+export default function LeadersManager({ onClose, onActivityUpdate }: LeadersManagerProps) {
   const [leaders, setLeaders] = useState<Leader[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -94,6 +95,7 @@ export default function LeadersManager({ onClose }: LeadersManagerProps) {
       await leadersService.addLeader(leaderData);
       setShowAddModal(false);
       resetForm();
+      onActivityUpdate?.('leader', 'Added', leaderData.name);
     } catch (error) {
       console.error('Error adding leader:', error);
     }
@@ -120,6 +122,7 @@ export default function LeadersManager({ onClose }: LeadersManagerProps) {
       await leadersService.updateLeader(editingLeader.id, leaderData);
       setEditingLeader(null);
       resetForm();
+      onActivityUpdate?.('leader', 'Updated', leaderData.name);
     } catch (error) {
       console.error('Error updating leader:', error);
     }
@@ -128,7 +131,9 @@ export default function LeadersManager({ onClose }: LeadersManagerProps) {
   const handleDeleteLeader = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this leader?')) {
       try {
+        const leader = leaders.find(l => l.id === id);
         await leadersService.deleteLeader(id);
+        onActivityUpdate?.('leader', 'Deleted', leader?.name || 'Leader');
       } catch (error) {
         console.error('Error deleting leader:', error);
       }

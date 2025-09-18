@@ -18,9 +18,10 @@ import {
 
 interface EventsManagerProps {
   onClose: () => void;
+  onActivityUpdate?: (type: string, action: string, item: string) => void;
 }
 
-export default function EventsManager({ onClose }: EventsManagerProps) {
+export default function EventsManager({ onClose, onActivityUpdate }: EventsManagerProps) {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -91,6 +92,7 @@ export default function EventsManager({ onClose }: EventsManagerProps) {
       await eventsService.addEvent(eventData);
       setShowAddModal(false);
       resetForm();
+      onActivityUpdate?.('event', 'Created', eventData.title);
     } catch (error) {
       console.error('Error adding event:', error);
     }
@@ -114,6 +116,7 @@ export default function EventsManager({ onClose }: EventsManagerProps) {
       await eventsService.updateEvent(editingEvent.id, eventData);
       setEditingEvent(null);
       resetForm();
+      onActivityUpdate?.('event', 'Updated', eventData.title);
     } catch (error) {
       console.error('Error updating event:', error);
     }
@@ -122,7 +125,9 @@ export default function EventsManager({ onClose }: EventsManagerProps) {
   const handleDeleteEvent = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this event?')) {
       try {
+        const event = events.find(e => e.id === id);
         await eventsService.deleteEvent(id);
+        onActivityUpdate?.('event', 'Deleted', event?.title || 'Event');
       } catch (error) {
         console.error('Error deleting event:', error);
       }

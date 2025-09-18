@@ -18,9 +18,10 @@ import {
 
 interface NewsManagerProps {
   onClose: () => void;
+  onActivityUpdate?: (type: string, action: string, item: string) => void;
 }
 
-export default function NewsManager({ onClose }: NewsManagerProps) {
+export default function NewsManager({ onClose, onActivityUpdate }: NewsManagerProps) {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -88,6 +89,7 @@ export default function NewsManager({ onClose }: NewsManagerProps) {
       await newsService.addNews(newsData);
       setShowAddModal(false);
       resetForm();
+      onActivityUpdate?.('news', 'Published', newsData.title);
     } catch (error) {
       console.error('Error adding news:', error);
     }
@@ -110,6 +112,7 @@ export default function NewsManager({ onClose }: NewsManagerProps) {
       await newsService.updateNews(editingNews.id, newsData);
       setEditingNews(null);
       resetForm();
+      onActivityUpdate?.('news', 'Updated', newsData.title);
     } catch (error) {
       console.error('Error updating news:', error);
     }
@@ -118,7 +121,9 @@ export default function NewsManager({ onClose }: NewsManagerProps) {
   const handleDeleteNews = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this article?')) {
       try {
+        const news = newsItems.find(n => n.id === id);
         await newsService.deleteNews(id);
+        onActivityUpdate?.('news', 'Deleted', news?.title || 'Article');
       } catch (error) {
         console.error('Error deleting news:', error);
       }
