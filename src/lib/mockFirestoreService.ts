@@ -1,9 +1,10 @@
-import { Event, NewsItem, Leader } from '../types';
+import { Event, NewsItem, Leader, Resource } from '../types';
 
 // Subscriber arrays for real-time updates
 let eventSubscribers: ((events: Event[]) => void)[] = [];
 let newsSubscribers: ((news: NewsItem[]) => void)[] = [];
 let leaderSubscribers: ((leaders: Leader[]) => void)[] = [];
+let resourceSubscribers: ((resources: Resource[]) => void)[] = [];
 
 // Mock data
 let mockEvents: Event[] = [
@@ -53,6 +54,51 @@ let mockLeaders: Leader[] = [
       linkedin: 'https://linkedin.com/in/sarahmwangi',
       twitter: 'https://twitter.com/sarahmwangi_ufa'
     }
+  }
+];
+
+let mockResources: Resource[] = [
+  {
+    id: '1',
+    title: 'UFA Policy Framework 2024',
+    description: 'Comprehensive policy framework outlining UFA\'s vision for Kenya\'s future development.',
+    type: 'document',
+    url: '/resources/ufa-policy-framework-2024.pdf',
+    fileName: 'ufa-policy-framework-2024.pdf',
+    fileSize: 2048576, // 2MB
+    mimeType: 'application/pdf',
+    category: 'Policy',
+    publishDate: new Date('2024-01-15'),
+    uploadedBy: 'Dr. Sarah Mwangi',
+    downloadCount: 1247
+  },
+  {
+    id: '2',
+    title: 'Education Reform Presentation',
+    description: 'Detailed presentation on proposed education reforms and digital literacy initiatives.',
+    type: 'presentation',
+    url: '/resources/education-reform-presentation.pptx',
+    fileName: 'education-reform-presentation.pptx',
+    fileSize: 5242880, // 5MB
+    mimeType: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    category: 'Education',
+    publishDate: new Date('2024-01-20'),
+    uploadedBy: 'UFA Education Team',
+    downloadCount: 892
+  },
+  {
+    id: '3',
+    title: 'Economic Development Report',
+    description: 'Quarterly report on economic development initiatives and progress tracking.',
+    type: 'report',
+    url: '/resources/economic-development-q1-2024.pdf',
+    fileName: 'economic-development-q1-2024.pdf',
+    fileSize: 3145728, // 3MB
+    mimeType: 'application/pdf',
+    category: 'Economy',
+    publishDate: new Date('2024-02-01'),
+    uploadedBy: 'UFA Economic Team',
+    downloadCount: 654
   }
 ];
 
@@ -289,6 +335,77 @@ export const leadersService = {
       const index = leaderSubscribers.indexOf(callback);
       if (index > -1) {
         leaderSubscribers.splice(index, 1);
+      }
+    };
+  }
+};
+
+// Resources Service
+export const resourcesService = {
+  async getResources(): Promise<Resource[]> {
+    console.log('Using mock resources data');
+    return [...mockResources];
+  },
+
+  async addResource(resource: Omit<Resource, 'id'>): Promise<string> {
+    console.log('Adding mock resource:', resource);
+    const newId = Date.now().toString();
+    const newResource: Resource = {
+      id: newId,
+      ...resource
+    };
+    mockResources.unshift(newResource);
+    
+    // Notify all subscribers
+    resourceSubscribers.forEach(callback => callback([...mockResources]));
+    
+    return newId;
+  },
+
+  async updateResource(id: string, resource: Partial<Resource>): Promise<void> {
+    console.log('Updating mock resource:', id, resource);
+    const index = mockResources.findIndex(r => r.id === id);
+    if (index !== -1) {
+      mockResources[index] = { ...mockResources[index], ...resource };
+      
+      // Notify all subscribers
+      resourceSubscribers.forEach(callback => callback([...mockResources]));
+    }
+  },
+
+  async deleteResource(id: string): Promise<void> {
+    console.log('Deleting mock resource:', id);
+    mockResources = mockResources.filter(r => r.id !== id);
+    
+    // Notify all subscribers
+    resourceSubscribers.forEach(callback => callback([...mockResources]));
+  },
+
+  async incrementDownloadCount(id: string): Promise<void> {
+    console.log('Incrementing download count for resource:', id);
+    const index = mockResources.findIndex(r => r.id === id);
+    if (index !== -1) {
+      mockResources[index].downloadCount = (mockResources[index].downloadCount || 0) + 1;
+      
+      // Notify all subscribers
+      resourceSubscribers.forEach(callback => callback([...mockResources]));
+    }
+  },
+
+  subscribeToResources(callback: (resources: Resource[]) => void): () => void {
+    console.log('Setting up mock resources subscription');
+    // Simulate real-time updates by calling callback immediately
+    callback([...mockResources]);
+    
+    // Store callback for future updates
+    resourceSubscribers.push(callback);
+    
+    // Return unsubscribe function
+    return () => {
+      console.log('Unsubscribing from mock resources');
+      const index = resourceSubscribers.indexOf(callback);
+      if (index > -1) {
+        resourceSubscribers.splice(index, 1);
       }
     };
   }

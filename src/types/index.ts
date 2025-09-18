@@ -39,10 +39,15 @@ export interface Resource {
   id: string;
   title: string;
   description: string;
-  type: 'document' | 'video' | 'article' | 'report';
+  type: 'document' | 'video' | 'article' | 'report' | 'image' | 'presentation' | 'spreadsheet';
   url: string;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
   category: string;
   publishDate: Date;
+  uploadedBy: string;
+  downloadCount?: number;
 }
 
 export interface Petition {
