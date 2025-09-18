@@ -1,4 +1,4 @@
-import { ArrowRight, Users, Target, Shield, Lightbulb, Calendar, BookOpen, TrendingUp } from 'lucide-react';
+import { ArrowRight, Users, Target, Shield, Lightbulb, Calendar, BookOpen, TrendingUp, X, MapPin, Clock, Mail, Phone, ExternalLink } from 'lucide-react';
 import { NavigationPage, NewsItem, Event } from '../types';
 import { useState, useEffect } from 'react';
 import { newsService, eventsService } from '../lib/mockFirestoreService';
@@ -11,6 +11,8 @@ export default function HomePage({ onNavigate }: HomePageProps) {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [showEventModal, setShowEventModal] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -31,6 +33,36 @@ export default function HomePage({ onNavigate }: HomePageProps) {
       unsubscribeEvents();
     };
   }, []);
+
+  const openEventModal = (event: Event) => {
+    setSelectedEvent(event);
+    setShowEventModal(true);
+  };
+
+  const closeEventModal = () => {
+    setSelectedEvent(null);
+    setShowEventModal(false);
+  };
+
+  const getEventIcon = (type: string) => {
+    switch (type) {
+      case 'rally': return Users;
+      case 'webinar': return BookOpen;
+      case 'meeting': return Users;
+      case 'fundraiser': return Users;
+      default: return Calendar;
+    }
+  };
+
+  const getEventTypeColor = (type: string) => {
+    switch (type) {
+      case 'rally': return 'bg-red-100 text-red-800';
+      case 'webinar': return 'bg-blue-100 text-blue-800';
+      case 'meeting': return 'bg-green-100 text-green-800';
+      case 'fundraiser': return 'bg-purple-100 text-purple-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   const coreValues = [
     {
@@ -687,7 +719,10 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                       </span>
                     </div>
                     
-                    <button className="group/btn bg-emerald-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-emerald-700 transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105">
+                    <button 
+                      onClick={() => openEventModal(event)}
+                      className="group/btn bg-emerald-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-emerald-700 transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105"
+                    >
                       {event.registrationRequired ? 'Register Now' : 'Learn More'}
                       <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
                     </button>
@@ -749,6 +784,130 @@ export default function HomePage({ onNavigate }: HomePageProps) {
           </div>
         </div>
       </section>
+
+      {/* Event Details Modal */}
+      {showEventModal && selectedEvent && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="relative">
+              <div className="h-48 bg-gradient-to-br from-emerald-400 to-green-500 relative overflow-hidden">
+                <img 
+                  src={selectedEvent.image} 
+                  alt={selectedEvent.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute top-4 left-4 flex gap-2">
+                  <span className={`px-3 py-1 rounded-full text-sm font-semibold capitalize ${getEventTypeColor(selectedEvent.type)}`}>
+                    {selectedEvent.type}
+                  </span>
+                </div>
+                <button
+                  onClick={closeEventModal}
+                  className="absolute top-4 right-4 w-8 h-8 bg-white bg-opacity-90 rounded-full flex items-center justify-center hover:bg-opacity-100 transition-all"
+                >
+                  <X className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">{selectedEvent.title}</h2>
+              
+              <div className="space-y-4 mb-6">
+                {/* Event Details */}
+                <div className="flex items-center gap-3 text-gray-600">
+                  <Calendar className="w-5 h-5 text-emerald-500" />
+                  <span className="font-medium">
+                    {selectedEvent.date.toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3 text-gray-600">
+                  <Clock className="w-5 h-5 text-emerald-500" />
+                  <span className="font-medium">
+                    {selectedEvent.date.toLocaleTimeString('en-US', {
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3 text-gray-600">
+                  <MapPin className="w-5 h-5 text-emerald-500" />
+                  <span className="font-medium">{selectedEvent.location}</span>
+                </div>
+
+                <div className="flex items-center gap-3 text-gray-600">
+                  {(() => {
+                    const EventIcon = getEventIcon(selectedEvent.type);
+                    return <EventIcon className="w-5 h-5 text-emerald-500" />;
+                  })()}
+                  <span className="font-medium capitalize">{selectedEvent.type}</span>
+                </div>
+              </div>
+
+              {/* Event Description */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">About This Event</h3>
+                <p className="text-gray-600 leading-relaxed">{selectedEvent.description}</p>
+              </div>
+
+              {/* Registration Info */}
+              {selectedEvent.registrationRequired && (
+                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-6">
+                  <h3 className="text-lg font-semibold text-emerald-800 mb-2">Registration Required</h3>
+                  <p className="text-emerald-700 text-sm">
+                    This event requires prior registration. Please register to secure your spot.
+                  </p>
+                </div>
+              )}
+
+              {/* Contact Information */}
+              <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Need More Information?</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3 text-gray-600">
+                    <Mail className="w-4 h-4 text-emerald-500" />
+                    <span>events@ufa.org</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-gray-600">
+                    <Phone className="w-4 h-4 text-emerald-500" />
+                    <span>+254 700 000 000</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                {selectedEvent.registrationRequired ? (
+                  <button className="flex-1 bg-emerald-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2">
+                    Register Now
+                    <ExternalLink className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <button className="flex-1 bg-emerald-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2">
+                    Get Directions
+                    <MapPin className="w-4 h-4" />
+                  </button>
+                )}
+                <button 
+                  onClick={closeEventModal}
+                  className="flex-1 border-2 border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
