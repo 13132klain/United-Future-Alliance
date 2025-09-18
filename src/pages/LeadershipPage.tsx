@@ -1,9 +1,23 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ExternalLink, Twitter, Linkedin, Facebook } from 'lucide-react';
 import { Leader } from '../types';
+import { leadersService } from '../lib/mockFirestoreService';
 
 export default function LeadershipPage() {
-  const leaders: Leader[] = [
+  const [leaders, setLeaders] = useState<Leader[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Set up real-time subscription for leaders
+    const unsubscribe = leadersService.subscribeToLeaders((leadersData) => {
+      setLeaders(leadersData);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const mockLeaders: Leader[] = [
     {
       id: '1',
       name: 'Dr. Sarah Mwangi',

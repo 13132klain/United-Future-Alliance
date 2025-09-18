@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Event } from '../../types';
-import { eventsService } from '../../lib/firestoreServices';
+import { eventsService } from '../../lib/mockFirestoreService';
 import { 
   Plus, 
   Search, 

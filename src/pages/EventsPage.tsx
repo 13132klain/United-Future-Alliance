@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, MapPin, Clock, Users, Video, ExternalLink } from 'lucide-react';
 import { Event } from '../types';
+import { eventsService } from '../lib/mockFirestoreService';
 
 export default function EventsPage() {
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
@@ -8,10 +9,18 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load mock data
     setLoading(true);
     
-    setEvents([
+    // Set up real-time subscription for events
+    const unsubscribe = eventsService.subscribeToEvents((eventsData) => {
+      setEvents(eventsData);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const mockEvents: Event[] = [
       {
         id: '1',
         title: 'National Youth Summit 2024',

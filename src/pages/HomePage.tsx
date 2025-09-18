@@ -1,6 +1,7 @@
 import { ArrowRight, Users, Target, Shield, Lightbulb, Calendar, BookOpen, TrendingUp } from 'lucide-react';
 import { NavigationPage, NewsItem, Event } from '../types';
 import { useState, useEffect } from 'react';
+import { newsService, eventsService } from '../lib/mockFirestoreService';
 
 interface HomePageProps {
   onNavigate: (page: NavigationPage) => void;
@@ -12,66 +13,23 @@ export default function HomePage({ onNavigate }: HomePageProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load mock data
     setLoading(true);
     
-    // Mock news data
-    setNewsItems([
-      {
-        id: '1',
-        title: 'UFA Launches Comprehensive Education Reform Initiative',
-        excerpt: 'New policy proposals aim to transform Kenya\'s education system with focus on digital literacy and vocational training.',
-        content: '',
-        author: 'UFA Communications Team',
-        publishDate: new Date('2024-01-15'),
-        category: 'Education',
-        image: 'https://images.pexels.com/photos/289737/pexels-photo-289737.jpeg?auto=compress&cs=tinysrgb&w=800'
-      },
-      {
-        id: '2',
-        title: 'Community Town Halls Begin Across All Counties',
-        excerpt: 'UFA leaders begin nationwide listening tour to engage directly with citizens about local challenges and solutions.',
-        content: '',
-        author: 'Field Operations',
-        publishDate: new Date('2024-01-12'),
-        category: 'Community',
-        image: 'https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg?auto=compress&cs=tinysrgb&w=800'
-      },
-      {
-        id: '3',
-        title: 'Youth Employment Program Reaches 10,000 Participants',
-        excerpt: 'UFA\'s flagship youth employment initiative achieves major milestone, connecting young Kenyans with sustainable career opportunities.',
-        content: '',
-        author: 'Youth Affairs Department',
-        publishDate: new Date('2024-01-10'),
-        category: 'Youth',
-        image: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=800'
-      }
-    ]);
+    // Set up real-time subscriptions for live updates
+    const unsubscribeNews = newsService.subscribeToLatestNews((news) => {
+      setNewsItems(news.slice(0, 3));
+      setLoading(false);
+    }, 3);
 
-    // Mock events data
-    setUpcomingEvents([
-      {
-        id: '1',
-        title: 'National Youth Summit 2024',
-        description: 'Empowering Kenya\'s youth through innovation and leadership',
-        date: new Date('2024-02-15'),
-        location: 'KICC, Nairobi',
-        type: 'rally',
-        registrationRequired: true
-      },
-      {
-        id: '2',
-        title: 'Economic Policy Webinar',
-        description: 'Digital discussion on sustainable economic growth strategies',
-        date: new Date('2024-02-20'),
-        location: 'Online',
-        type: 'webinar',
-        registrationRequired: true
-      }
-    ]);
+    const unsubscribeEvents = eventsService.subscribeToUpcomingEvents((events) => {
+      setUpcomingEvents(events.slice(0, 2));
+    }, 2);
 
-    setLoading(false);
+    // Cleanup subscriptions on unmount
+    return () => {
+      unsubscribeNews();
+      unsubscribeEvents();
+    };
   }, []);
 
   const coreValues = [
