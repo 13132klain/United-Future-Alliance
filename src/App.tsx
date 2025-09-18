@@ -7,6 +7,7 @@ import LeadershipPage from './pages/LeadershipPage';
 import ResourcesPage from './pages/ResourcesPage';
 import DonatePage from './pages/DonatePage';
 import AuthPage from './pages/AuthPage';
+import AdminDashboard from './pages/AdminDashboard';
 import { AuthProvider } from './contexts/AuthContext';
 import { NavigationPage } from './types';
 
