@@ -4,6 +4,7 @@ import {
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
   signInWithPopup,
+  sendPasswordResetEmail,
   signOut, 
   updateProfile,
   User as FirebaseUser
@@ -19,6 +20,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   logout: () => void;
   clearError: () => void;
 }
@@ -229,6 +231,47 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const resetPassword = async (email: string): Promise<void> => {
+    setError(null);
+    setLoading(true);
+
+    try {
+      if (!isFirebaseConfigured() || !auth) {
+        throw new Error('Firebase authentication is not configured. Please check your setup.');
+      }
+
+      // Basic validation
+      if (!email.includes('@')) {
+        throw new Error('Please enter a valid email address');
+      }
+
+      // Send password reset email
+      await sendPasswordResetEmail(auth, email);
+      
+      console.log('✅ Password reset email sent to:', email);
+    } catch (error: any) {
+      console.error('❌ Password reset error:', error);
+      
+      // Handle specific password reset errors
+      let errorMessage = 'Failed to send password reset email. Please try again.';
+      
+      if (error.code === 'auth/user-not-found') {
+        errorMessage = 'No account found with this email address.';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Please enter a valid email address.';
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMessage = 'Too many password reset attempts. Please try again later.';
+      } else if (error.code === 'auth/network-request-failed') {
+        errorMessage = 'Network error. Please check your connection and try again.';
+      }
+      
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = async (): Promise<void> => {
     try {
       if (isFirebaseConfigured() && auth) {
@@ -257,6 +300,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signIn,
     signUp,
     signInWithGoogle,
+    resetPassword,
     logout,
     clearError,
   };

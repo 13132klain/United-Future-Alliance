@@ -19,7 +19,7 @@ interface AuthPageProps {
 }
 
 export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
-  const { signIn, signUp, signInWithGoogle, loading, error, clearError } = useAuth();
+  const { signIn, signUp, signInWithGoogle, resetPassword, loading, error, clearError } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -30,6 +30,9 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetSuccess, setResetSuccess] = useState(false);
 
   const isLogin = mode === 'login';
 
@@ -87,6 +90,23 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
     } catch (err) {
       // Error is handled by AuthContext
       console.error('Google sign-in error:', err);
+    }
+  };
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await resetPassword(resetEmail);
+      setResetSuccess(true);
+      // Close modal after 3 seconds
+      setTimeout(() => {
+        setShowResetModal(false);
+        setResetEmail('');
+        setResetSuccess(false);
+      }, 3000);
+    } catch (err) {
+      // Error is handled by AuthContext
+      console.error('Password reset error:', err);
     }
   };
 
@@ -225,6 +245,18 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
                   </button>
                 </div>
               </div>
+              {/* Forgot Password Link - Only show on login */}
+              {isLogin && (
+                <div className="mt-2 text-right">
+                  <button
+                    type="button"
+                    onClick={() => setShowResetModal(true)}
+                    className="text-sm text-emerald-600 hover:text-emerald-500 transition-colors"
+                  >
+                    Forgot your password?
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Confirm Password Field (Register only) */}
@@ -335,6 +367,81 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
           <p>By continuing, you agree to UFA's Terms of Service and Privacy Policy</p>
         </div>
       </div>
+
+      {/* Password Reset Modal */}
+      {showResetModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Lock className="w-8 h-8 text-emerald-600" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Reset Password</h3>
+              <p className="text-gray-600">
+                Enter your email address and we'll send you a link to reset your password.
+              </p>
+            </div>
+
+            {resetSuccess ? (
+              <div className="text-center">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="w-8 h-8 text-green-600" />
+                </div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-2">Email Sent!</h4>
+                <p className="text-gray-600 mb-4">
+                  We've sent a password reset link to <strong>{resetEmail}</strong>
+                </p>
+                <p className="text-sm text-gray-500">
+                  Please check your email and follow the instructions to reset your password.
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handlePasswordReset} className="space-y-4">
+                <div>
+                  <label htmlFor="resetEmail" className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Mail className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      id="resetEmail"
+                      type="email"
+                      required
+                      className="appearance-none rounded-lg relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                      placeholder="Enter your email"
+                      value={resetEmail}
+                      onChange={(e) => setResetEmail(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowResetModal(false);
+                      setResetEmail('');
+                      clearError();
+                    }}
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex-1 px-4 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {loading ? 'Sending...' : 'Send Reset Link'}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
