@@ -30,23 +30,7 @@ function App() {
       case 'register':
         return <AuthPage mode="register" onNavigate={setCurrentPage} />;
       case 'admin':
-        return (
-          <div className="min-h-screen bg-gray-50 py-12">
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center mb-12">
-                <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">Admin Dashboard</h1>
-                <p className="text-xl text-gray-600">Manage UFA content and settings.</p>
-              </div>
-              <div className="bg-white rounded-xl shadow-lg p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Coming Soon</h2>
-                <p className="text-gray-600 leading-relaxed">
-                  The admin dashboard is currently under development. Soon you'll be able to manage events, 
-                  news, resources, and other content from this interface.
-                </p>
-              </div>
-            </div>
-          </div>
-        );
+        return <AdminDashboard onNavigate={setCurrentPage} />;
       case 'about':
         return (
           <div className="min-h-screen bg-gray-50 py-12">
