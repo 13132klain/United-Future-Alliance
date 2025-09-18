@@ -76,6 +76,8 @@ export const eventsService = {
       ...event
     };
     mockEvents.unshift(newEvent);
+    console.log('Mock events after adding:', mockEvents);
+    console.log('Notifying', eventSubscribers.length, 'subscribers');
     
     // Notify all subscribers
     eventSubscribers.forEach(callback => callback([...mockEvents]));
@@ -103,7 +105,7 @@ export const eventsService = {
   },
 
   subscribeToEvents(callback: (events: Event[]) => void): () => void {
-    console.log('Setting up mock events subscription');
+    console.log('Setting up mock events subscription, current events:', mockEvents);
     // Simulate real-time updates by calling callback immediately
     callback([...mockEvents]);
     

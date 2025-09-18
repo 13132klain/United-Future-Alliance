@@ -13,6 +13,7 @@ export default function EventsPage() {
     
     // Set up real-time subscription for events
     const unsubscribe = eventsService.subscribeToEvents((eventsData) => {
+      console.log('EventsPage received events:', eventsData);
       setEvents(eventsData);
       setLoading(false);
     });
@@ -127,8 +128,14 @@ export default function EventsPage() {
         </div>
 
         {/* Events Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredEvents.map((event) => {
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+            <p className="mt-4 text-gray-600">Loading events...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredEvents.map((event) => {
             const EventIcon = getEventIcon(event.type);
             return (
               <div key={event.id} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
@@ -195,7 +202,8 @@ export default function EventsPage() {
               </div>
             );
           })}
-        </div>
+          </div>
+        )}
 
         {/* Call to Action */}
         <div className="text-center mt-16">
