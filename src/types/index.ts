@@ -60,6 +60,37 @@ export interface Petition {
   endDate: Date;
 }
 
+export interface Donation {
+  id: string;
+  amount: number;
+  currency: string;
+  donorName: string;
+  donorEmail: string;
+  donorPhone?: string;
+  isAnonymous: boolean;
+  campaign?: string;
+  message?: string;
+  paymentMethod: 'card' | 'mobile_money' | 'bank_transfer';
+  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  transactionId?: string;
+  createdAt: Date;
+  processedAt?: Date;
+}
+
+export interface DonationCampaign {
+  id: string;
+  title: string;
+  description: string;
+  targetAmount: number;
+  currentAmount: number;
+  startDate: Date;
+  endDate?: Date;
+  isActive: boolean;
+  image?: string;
+  category: 'general' | 'education' | 'healthcare' | 'infrastructure' | 'emergency';
+  featured: boolean;
+}
+
 export interface User {
   id: string;
   name: string;

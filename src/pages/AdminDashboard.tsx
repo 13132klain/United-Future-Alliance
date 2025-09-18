@@ -5,14 +5,16 @@ import EventsManager from '../components/admin/EventsManager';
 import NewsManager from '../components/admin/NewsManager';
 import LeadersManager from '../components/admin/LeadersManager';
 import ResourcesManager from '../components/admin/ResourcesManager';
+import DonationsManager from '../components/admin/DonationsManager';
 import SettingsManager from '../components/admin/SettingsManager';
-import { eventsService, newsService, leadersService, resourcesService } from '../lib/mockFirestoreService';
+import { eventsService, newsService, leadersService, resourcesService, donationsService } from '../lib/mockFirestoreService';
 import { 
   LayoutDashboard, 
   Calendar, 
   Newspaper, 
   Users, 
   FileText,
+  Heart,
   Settings, 
   Plus,
   BarChart3,
@@ -31,7 +33,7 @@ interface AdminDashboardProps {
   onNavigate: (page: NavigationPage) => void;
 }
 
-type DashboardTab = 'overview' | 'events' | 'news' | 'leaders' | 'resources' | 'settings';
+type DashboardTab = 'overview' | 'events' | 'news' | 'leaders' | 'resources' | 'donations' | 'settings';
 
 export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
   const { user } = useAuth();
@@ -44,6 +46,7 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
     totalNews: 0,
     totalLeaders: 0,
     totalResources: 0,
+    totalDonations: 0,
     totalUsers: 1247 // This would come from user service in a real app
   });
 
@@ -73,11 +76,16 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
       setStats(prev => ({ ...prev, totalResources: resources.length }));
     });
 
+    const unsubscribeDonations = donationsService.subscribeToDonations((donations) => {
+      setStats(prev => ({ ...prev, totalDonations: donations.length }));
+    });
+
     return () => {
       unsubscribeEvents();
       unsubscribeNews();
       unsubscribeLeaders();
       unsubscribeResources();
+      unsubscribeDonations();
     };
   }, []);
 
@@ -133,6 +141,7 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
     { id: 'news', label: 'News', icon: Newspaper },
     { id: 'leaders', label: 'Leaders', icon: Users },
     { id: 'resources', label: 'Resources', icon: FileText },
+    { id: 'donations', label: 'Donations', icon: Heart },
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
@@ -154,7 +163,7 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
       </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
@@ -212,6 +221,21 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
           </div>
           <div className="mt-4">
             <span className="text-sm text-green-600 font-medium">+5 this week</span>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Donations</p>
+              <p className="text-3xl font-bold text-gray-900">{stats.totalDonations}</p>
+            </div>
+            <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center">
+              <Heart className="w-6 h-6 text-pink-600" />
+            </div>
+          </div>
+          <div className="mt-4">
+            <span className="text-sm text-green-600 font-medium">+12 this week</span>
           </div>
         </div>
 
@@ -302,6 +326,8 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
         return <LeadersManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
       case 'resources':
         return <ResourcesManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
+      case 'donations':
+        return <DonationsManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
       case 'settings':
         return <SettingsManager onClose={() => {}} />;
       default:

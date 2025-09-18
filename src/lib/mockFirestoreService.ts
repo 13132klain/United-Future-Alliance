@@ -1,10 +1,12 @@
-import { Event, NewsItem, Leader, Resource } from '../types';
+import { Event, NewsItem, Leader, Resource, Donation, DonationCampaign } from '../types';
 
 // Subscriber arrays for real-time updates
 let eventSubscribers: ((events: Event[]) => void)[] = [];
 let newsSubscribers: ((news: NewsItem[]) => void)[] = [];
 let leaderSubscribers: ((leaders: Leader[]) => void)[] = [];
 let resourceSubscribers: ((resources: Resource[]) => void)[] = [];
+let donationSubscribers: ((donations: Donation[]) => void)[] = [];
+let campaignSubscribers: ((campaigns: DonationCampaign[]) => void)[] = [];
 
 // Mock data
 let mockEvents: Event[] = [
@@ -99,6 +101,106 @@ let mockResources: Resource[] = [
     publishDate: new Date('2024-02-01'),
     uploadedBy: 'UFA Economic Team',
     downloadCount: 654
+  }
+];
+
+let mockDonations: Donation[] = [
+  {
+    id: '1',
+    amount: 5000,
+    currency: 'KES',
+    donorName: 'John Mwangi',
+    donorEmail: 'john.mwangi@email.com',
+    donorPhone: '+254712345678',
+    isAnonymous: false,
+    campaign: 'Education for All',
+    message: 'Supporting education initiatives in rural areas',
+    paymentMethod: 'mobile_money',
+    status: 'completed',
+    transactionId: 'TXN_001_2024',
+    createdAt: new Date('2024-01-15'),
+    processedAt: new Date('2024-01-15')
+  },
+  {
+    id: '2',
+    amount: 10000,
+    currency: 'KES',
+    donorName: 'Anonymous',
+    donorEmail: 'anonymous@email.com',
+    isAnonymous: true,
+    campaign: 'Healthcare Access',
+    message: 'Keep up the great work!',
+    paymentMethod: 'card',
+    status: 'completed',
+    transactionId: 'TXN_002_2024',
+    createdAt: new Date('2024-01-20'),
+    processedAt: new Date('2024-01-20')
+  },
+  {
+    id: '3',
+    amount: 2500,
+    currency: 'KES',
+    donorName: 'Mary Wanjiku',
+    donorEmail: 'mary.wanjiku@email.com',
+    donorPhone: '+254723456789',
+    isAnonymous: false,
+    campaign: 'Infrastructure Development',
+    paymentMethod: 'bank_transfer',
+    status: 'pending',
+    createdAt: new Date('2024-02-01')
+  }
+];
+
+let mockCampaigns: DonationCampaign[] = [
+  {
+    id: '1',
+    title: 'Education for All',
+    description: 'Supporting digital literacy and educational infrastructure in rural Kenya. Help us provide tablets, internet connectivity, and training for students and teachers.',
+    targetAmount: 5000000,
+    currentAmount: 1250000,
+    startDate: new Date('2024-01-01'),
+    endDate: new Date('2024-12-31'),
+    isActive: true,
+    image: 'https://images.pexels.com/photos/289737/pexels-photo-289737.jpeg?auto=compress&cs=tinysrgb&w=800',
+    category: 'education',
+    featured: true
+  },
+  {
+    id: '2',
+    title: 'Healthcare Access',
+    description: 'Improving healthcare access in underserved communities. Funding mobile clinics, medical equipment, and community health worker training.',
+    targetAmount: 3000000,
+    currentAmount: 850000,
+    startDate: new Date('2024-01-15'),
+    endDate: new Date('2024-11-30'),
+    isActive: true,
+    image: 'https://images.pexels.com/photos/263402/pexels-photo-263402.jpeg?auto=compress&cs=tinysrgb&w=800',
+    category: 'healthcare',
+    featured: true
+  },
+  {
+    id: '3',
+    title: 'Infrastructure Development',
+    description: 'Building sustainable infrastructure including roads, water systems, and renewable energy projects in rural communities.',
+    targetAmount: 10000000,
+    currentAmount: 2100000,
+    startDate: new Date('2024-02-01'),
+    isActive: true,
+    image: 'https://images.pexels.com/photos/2219024/pexels-photo-2219024.jpeg?auto=compress&cs=tinysrgb&w=800',
+    category: 'infrastructure',
+    featured: false
+  },
+  {
+    id: '4',
+    title: 'Emergency Relief Fund',
+    description: 'Supporting communities affected by natural disasters and emergencies with immediate relief and long-term recovery assistance.',
+    targetAmount: 2000000,
+    currentAmount: 450000,
+    startDate: new Date('2024-01-01'),
+    isActive: true,
+    image: 'https://images.pexels.com/photos/6646877/pexels-photo-6646877.jpeg?auto=compress&cs=tinysrgb&w=800',
+    category: 'emergency',
+    featured: false
   }
 ];
 
@@ -406,6 +508,147 @@ export const resourcesService = {
       const index = resourceSubscribers.indexOf(callback);
       if (index > -1) {
         resourceSubscribers.splice(index, 1);
+      }
+    };
+  }
+};
+
+// Donations Service
+export const donationsService = {
+  async getDonations(): Promise<Donation[]> {
+    console.log('Using mock donations data');
+    return [...mockDonations];
+  },
+
+  async addDonation(donation: Omit<Donation, 'id'>): Promise<string> {
+    console.log('Adding mock donation:', donation);
+    const newId = Date.now().toString();
+    const newDonation: Donation = {
+      id: newId,
+      ...donation
+    };
+    mockDonations.unshift(newDonation);
+    
+    // Notify all subscribers
+    donationSubscribers.forEach(callback => callback([...mockDonations]));
+    
+    return newId;
+  },
+
+  async updateDonation(id: string, donation: Partial<Donation>): Promise<void> {
+    console.log('Updating mock donation:', id, donation);
+    const index = mockDonations.findIndex(d => d.id === id);
+    if (index !== -1) {
+      mockDonations[index] = { ...mockDonations[index], ...donation };
+      
+      // Notify all subscribers
+      donationSubscribers.forEach(callback => callback([...mockDonations]));
+    }
+  },
+
+  async deleteDonation(id: string): Promise<void> {
+    console.log('Deleting mock donation:', id);
+    mockDonations = mockDonations.filter(d => d.id !== id);
+    
+    // Notify all subscribers
+    donationSubscribers.forEach(callback => callback([...mockDonations]));
+  },
+
+  subscribeToDonations(callback: (donations: Donation[]) => void): () => void {
+    console.log('Setting up mock donations subscription');
+    // Simulate real-time updates by calling callback immediately
+    callback([...mockDonations]);
+    
+    // Store callback for future updates
+    donationSubscribers.push(callback);
+    
+    // Return unsubscribe function
+    return () => {
+      console.log('Unsubscribing from mock donations');
+      const index = donationSubscribers.indexOf(callback);
+      if (index > -1) {
+        donationSubscribers.splice(index, 1);
+      }
+    };
+  }
+};
+
+// Donation Campaigns Service
+export const campaignsService = {
+  async getCampaigns(): Promise<DonationCampaign[]> {
+    console.log('Using mock campaigns data');
+    return [...mockCampaigns];
+  },
+
+  async getActiveCampaigns(): Promise<DonationCampaign[]> {
+    console.log('Using mock active campaigns data');
+    return [...mockCampaigns].filter(c => c.isActive);
+  },
+
+  async getFeaturedCampaigns(): Promise<DonationCampaign[]> {
+    console.log('Using mock featured campaigns data');
+    return [...mockCampaigns].filter(c => c.featured && c.isActive);
+  },
+
+  async addCampaign(campaign: Omit<DonationCampaign, 'id'>): Promise<string> {
+    console.log('Adding mock campaign:', campaign);
+    const newId = Date.now().toString();
+    const newCampaign: DonationCampaign = {
+      id: newId,
+      ...campaign
+    };
+    mockCampaigns.unshift(newCampaign);
+    
+    // Notify all subscribers
+    campaignSubscribers.forEach(callback => callback([...mockCampaigns]));
+    
+    return newId;
+  },
+
+  async updateCampaign(id: string, campaign: Partial<DonationCampaign>): Promise<void> {
+    console.log('Updating mock campaign:', id, campaign);
+    const index = mockCampaigns.findIndex(c => c.id === id);
+    if (index !== -1) {
+      mockCampaigns[index] = { ...mockCampaigns[index], ...campaign };
+      
+      // Notify all subscribers
+      campaignSubscribers.forEach(callback => callback([...mockCampaigns]));
+    }
+  },
+
+  async deleteCampaign(id: string): Promise<void> {
+    console.log('Deleting mock campaign:', id);
+    mockCampaigns = mockCampaigns.filter(c => c.id !== id);
+    
+    // Notify all subscribers
+    campaignSubscribers.forEach(callback => callback([...mockCampaigns]));
+  },
+
+  async updateCampaignAmount(id: string, amount: number): Promise<void> {
+    console.log('Updating campaign amount:', id, amount);
+    const index = mockCampaigns.findIndex(c => c.id === id);
+    if (index !== -1) {
+      mockCampaigns[index].currentAmount += amount;
+      
+      // Notify all subscribers
+      campaignSubscribers.forEach(callback => callback([...mockCampaigns]));
+    }
+  },
+
+  subscribeToCampaigns(callback: (campaigns: DonationCampaign[]) => void): () => void {
+    console.log('Setting up mock campaigns subscription');
+    // Simulate real-time updates by calling callback immediately
+    callback([...mockCampaigns]);
+    
+    // Store callback for future updates
+    campaignSubscribers.push(callback);
+    
+    // Return unsubscribe function
+    return () => {
+      console.log('Unsubscribing from mock campaigns');
+      const index = campaignSubscribers.indexOf(callback);
+      if (index > -1) {
+        campaignSubscribers.splice(index, 1);
       }
     };
   }

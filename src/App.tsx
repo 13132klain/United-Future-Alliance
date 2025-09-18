@@ -5,7 +5,7 @@ import HomePage from './pages/HomePage';
 import EventsPage from './pages/EventsPage';
 import LeadershipPage from './pages/LeadershipPage';
 import ResourcesPage from './pages/ResourcesPage';
-import DonatePage from './pages/DonatePage';
+import DonationPage from './pages/DonationPage';
 import AuthPage from './pages/AuthPage';
 import AdminDashboard from './pages/AdminDashboard';
 import { AuthProvider } from './contexts/AuthContext';
@@ -25,7 +25,7 @@ function App() {
       case 'resources':
         return <ResourcesPage />;
       case 'donate':
-        return <DonatePage />;
+        return <DonationPage />;
       case 'login':
         return <AuthPage mode="login" onNavigate={setCurrentPage} />;
       case 'register':
