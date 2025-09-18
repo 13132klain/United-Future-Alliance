@@ -1,5 +1,10 @@
 import { Event, NewsItem, Leader } from '../types';
 
+// Subscriber arrays for real-time updates
+let eventSubscribers: ((events: Event[]) => void)[] = [];
+let newsSubscribers: ((news: NewsItem[]) => void)[] = [];
+let leaderSubscribers: ((leaders: Leader[]) => void)[] = [];
+
 // Mock data
 let mockEvents: Event[] = [
   {
@@ -71,6 +76,10 @@ export const eventsService = {
       ...event
     };
     mockEvents.unshift(newEvent);
+    
+    // Notify all subscribers
+    eventSubscribers.forEach(callback => callback([...mockEvents]));
+    
     return newId;
   },
 
@@ -79,12 +88,18 @@ export const eventsService = {
     const index = mockEvents.findIndex(e => e.id === id);
     if (index !== -1) {
       mockEvents[index] = { ...mockEvents[index], ...event };
+      
+      // Notify all subscribers
+      eventSubscribers.forEach(callback => callback([...mockEvents]));
     }
   },
 
   async deleteEvent(id: string): Promise<void> {
     console.log('Deleting mock event:', id);
     mockEvents = mockEvents.filter(e => e.id !== id);
+    
+    // Notify all subscribers
+    eventSubscribers.forEach(callback => callback([...mockEvents]));
   },
 
   subscribeToEvents(callback: (events: Event[]) => void): () => void {
@@ -92,9 +107,16 @@ export const eventsService = {
     // Simulate real-time updates by calling callback immediately
     callback([...mockEvents]);
     
+    // Store callback for future updates
+    eventSubscribers.push(callback);
+    
     // Return unsubscribe function
     return () => {
       console.log('Unsubscribing from mock events');
+      const index = eventSubscribers.indexOf(callback);
+      if (index > -1) {
+        eventSubscribers.splice(index, 1);
+      }
     };
   },
 
@@ -130,6 +152,10 @@ export const newsService = {
       ...news
     };
     mockNews.unshift(newNews);
+    
+    // Notify all subscribers
+    newsSubscribers.forEach(callback => callback([...mockNews]));
+    
     return newId;
   },
 
@@ -138,12 +164,18 @@ export const newsService = {
     const index = mockNews.findIndex(n => n.id === id);
     if (index !== -1) {
       mockNews[index] = { ...mockNews[index], ...news };
+      
+      // Notify all subscribers
+      newsSubscribers.forEach(callback => callback([...mockNews]));
     }
   },
 
   async deleteNews(id: string): Promise<void> {
     console.log('Deleting mock news:', id);
     mockNews = mockNews.filter(n => n.id !== id);
+    
+    // Notify all subscribers
+    newsSubscribers.forEach(callback => callback([...mockNews]));
   },
 
   subscribeToNews(callback: (news: NewsItem[]) => void): () => void {
@@ -151,9 +183,16 @@ export const newsService = {
     // Simulate real-time updates by calling callback immediately
     callback([...mockNews]);
     
+    // Store callback for future updates
+    newsSubscribers.push(callback);
+    
     // Return unsubscribe function
     return () => {
       console.log('Unsubscribing from mock news');
+      const index = newsSubscribers.indexOf(callback);
+      if (index > -1) {
+        newsSubscribers.splice(index, 1);
+      }
     };
   },
 
@@ -184,6 +223,10 @@ export const leadersService = {
       ...leader
     };
     mockLeaders.push(newLeader);
+    
+    // Notify all subscribers
+    leaderSubscribers.forEach(callback => callback([...mockLeaders]));
+    
     return newId;
   },
 
@@ -192,12 +235,18 @@ export const leadersService = {
     const index = mockLeaders.findIndex(l => l.id === id);
     if (index !== -1) {
       mockLeaders[index] = { ...mockLeaders[index], ...leader };
+      
+      // Notify all subscribers
+      leaderSubscribers.forEach(callback => callback([...mockLeaders]));
     }
   },
 
   async deleteLeader(id: string): Promise<void> {
     console.log('Deleting mock leader:', id);
     mockLeaders = mockLeaders.filter(l => l.id !== id);
+    
+    // Notify all subscribers
+    leaderSubscribers.forEach(callback => callback([...mockLeaders]));
   },
 
   subscribeToLeaders(callback: (leaders: Leader[]) => void): () => void {
@@ -205,9 +254,16 @@ export const leadersService = {
     // Simulate real-time updates by calling callback immediately
     callback([...mockLeaders]);
     
+    // Store callback for future updates
+    leaderSubscribers.push(callback);
+    
     // Return unsubscribe function
     return () => {
       console.log('Unsubscribing from mock leaders');
+      const index = leaderSubscribers.indexOf(callback);
+      if (index > -1) {
+        leaderSubscribers.splice(index, 1);
+      }
     };
   }
 };
