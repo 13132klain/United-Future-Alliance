@@ -45,11 +45,12 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
   });
 
   const [recentActivity, setRecentActivity] = useState([
-    { id: 1, type: 'event', action: 'Created', item: 'Youth Summit 2024', time: '2 hours ago' },
-    { id: 2, type: 'news', action: 'Published', item: 'Education Reform Update', time: '4 hours ago' },
-    { id: 3, type: 'leader', action: 'Added', item: 'Dr. Sarah Mwangi', time: '1 day ago' },
-    { id: 4, type: 'event', action: 'Updated', item: 'Community Town Hall', time: '2 days ago' }
+    { id: 1, type: 'event', action: 'Created', item: 'Youth Summit 2024', time: '2 hours ago', timestamp: Date.now() - 2 * 60 * 60 * 1000 },
+    { id: 2, type: 'news', action: 'Published', item: 'Education Reform Update', time: '4 hours ago', timestamp: Date.now() - 4 * 60 * 60 * 1000 },
+    { id: 3, type: 'leader', action: 'Added', item: 'Dr. Sarah Mwangi', time: '1 day ago', timestamp: Date.now() - 24 * 60 * 60 * 1000 },
+    { id: 4, type: 'event', action: 'Updated', item: 'Community Town Hall', time: '2 days ago', timestamp: Date.now() - 2 * 24 * 60 * 60 * 1000 }
   ]);
+  const [newActivityCount, setNewActivityCount] = useState(0);
 
   // Set up real-time subscriptions for overview stats
   useEffect(() => {
@@ -74,15 +75,49 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
 
   // Function to add recent activity (called by child components)
   const addRecentActivity = (type: string, action: string, item: string) => {
+    const timestamp = Date.now();
     const newActivity = {
-      id: Date.now(),
+      id: timestamp,
       type,
       action,
       item,
-      time: 'Just now'
+      time: 'Just now',
+      timestamp
     };
-    setRecentActivity(prev => [newActivity, ...prev.slice(0, 3)]);
+    setRecentActivity(prev => [newActivity, ...prev.slice(0, 9)]); // Keep more activities visible
+    setNewActivityCount(prev => prev + 1);
+    
+    // Auto-clear notification after 3 seconds
+    setTimeout(() => {
+      setNewActivityCount(prev => Math.max(0, prev - 1));
+    }, 3000);
   };
+
+  // Function to format time ago
+  const formatTimeAgo = (timestamp: number) => {
+    const now = Date.now();
+    const diff = now - timestamp;
+    
+    if (diff < 60000) return 'Just now';
+    if (diff < 3600000) return `${Math.floor(diff / 60000)} minutes ago`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)} hours ago`;
+    if (diff < 604800000) return `${Math.floor(diff / 86400000)} days ago`;
+    return `${Math.floor(diff / 604800000)} weeks ago`;
+  };
+
+  // Update activity timestamps in real-time
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRecentActivity(prev => 
+        prev.map(activity => ({
+          ...activity,
+          time: formatTimeAgo(activity.timestamp)
+        }))
+      );
+    }, 30000); // Update every 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   const sidebarItems = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -172,35 +207,62 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
         </div>
       </div>
 
-      {/* Recent Activity */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-        <div className="p-6 border-b border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
-        </div>
-        <div className="p-6">
-          <div className="space-y-4">
-            {recentActivity.map((activity) => (
-              <div key={activity.id} className="flex items-center space-x-4">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  activity.type === 'event' ? 'bg-blue-100' :
-                  activity.type === 'news' ? 'bg-emerald-100' :
-                  'bg-purple-100'
-                }`}>
-                  {activity.type === 'event' ? <Calendar className="w-5 h-5 text-blue-600" /> :
-                   activity.type === 'news' ? <Newspaper className="w-5 h-5 text-emerald-600" /> :
-                   <Users className="w-5 h-5 text-purple-600" />}
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">
-                    {activity.action} {activity.item}
-                  </p>
-                  <p className="text-sm text-gray-500">{activity.time}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+       {/* Recent Activity */}
+       <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+         <div className="p-6 border-b border-gray-100">
+           <div className="flex items-center justify-between">
+             <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
+             <div className="flex items-center space-x-2">
+               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+               <span className="text-xs text-gray-500">Live</span>
+             </div>
+           </div>
+         </div>
+         <div className="p-6">
+           <div className="space-y-4">
+             {recentActivity.slice(0, 6).map((activity) => (
+               <div key={activity.id} className="flex items-center space-x-4 group hover:bg-gray-50 p-2 rounded-lg transition-colors">
+                 <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 ${
+                   activity.type === 'event' ? 'bg-blue-100 group-hover:bg-blue-200' :
+                   activity.type === 'news' ? 'bg-emerald-100 group-hover:bg-emerald-200' :
+                   'bg-purple-100 group-hover:bg-purple-200'
+                 }`}>
+                   {activity.type === 'event' ? <Calendar className="w-5 h-5 text-blue-600" /> :
+                    activity.type === 'news' ? <Newspaper className="w-5 h-5 text-emerald-600" /> :
+                    <Users className="w-5 h-5 text-purple-600" />}
+                 </div>
+                 <div className="flex-1 min-w-0">
+                   <p className="text-sm font-medium text-gray-900 truncate">
+                     {activity.action} <span className="font-semibold">{activity.item}</span>
+                   </p>
+                   <p className="text-sm text-gray-500 flex items-center space-x-1">
+                     <span>{activity.time}</span>
+                     {activity.time === 'Just now' && (
+                       <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                     )}
+                   </p>
+                 </div>
+                 <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                   activity.type === 'event' ? 'bg-blue-50 text-blue-700' :
+                   activity.type === 'news' ? 'bg-emerald-50 text-emerald-700' :
+                   'bg-purple-50 text-purple-700'
+                 }`}>
+                   {activity.type}
+                 </div>
+               </div>
+             ))}
+             {recentActivity.length === 0 && (
+               <div className="text-center py-8">
+                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                   <Bell className="w-8 h-8 text-gray-400" />
+                 </div>
+                 <p className="text-gray-500">No recent activity</p>
+                 <p className="text-sm text-gray-400">Activities will appear here as you manage content</p>
+               </div>
+             )}
+           </div>
+         </div>
+       </div>
     </div>
   );
 
@@ -251,11 +313,18 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
                 />
               </div>
               
-              {/* Notifications */}
-              <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors relative">
-                <Bell className="w-5 h-5" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-              </button>
+               {/* Notifications */}
+               <button 
+                 className="p-2 rounded-lg hover:bg-gray-100 transition-colors relative"
+                 onClick={() => setActiveTab('overview')}
+               >
+                 <Bell className="w-5 h-5" />
+                 {newActivityCount > 0 && (
+                   <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-bold animate-pulse">
+                     {newActivityCount}
+                   </span>
+                 )}
+               </button>
               
               {/* User Menu */}
               <div className="flex items-center space-x-3">

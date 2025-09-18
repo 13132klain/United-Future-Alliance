@@ -126,23 +126,23 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
 
         {/* Main Auth Card */}
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-          {/* Header */}
-          <div className="text-center mb-8">
+        {/* Header */}
+        <div className="text-center mb-8">
             <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">UFA</span>
               </div>
-            </div>
+          </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
               {isLogin ? 'Welcome Back' : 'Join UFA'}
             </h2>
-            <p className="text-gray-600">
+          <p className="text-gray-600">
               {isLogin 
                 ? 'Sign in to your account to continue' 
                 : 'Create your account to get started'
-              }
-            </p>
-          </div>
+            }
+          </p>
+        </div>
 
           {/* Success Message */}
           {success && (
@@ -165,7 +165,7 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
             </div>
           )}
 
-          {/* Form */}
+        {/* Form */}
           <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Name Field (Register only) */}
             {!isLogin && (
@@ -236,13 +236,13 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
                   onChange={handleChange}
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
                     className="text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
-                  >
+                >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </button>
+                </button>
                 </div>
               </div>
               {/* Forgot Password Link - Only show on login */}
@@ -261,11 +261,11 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
 
             {/* Confirm Password Field (Register only) */}
             {!isLogin && (
-              <div>
+                <div>
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirm Password
-                </label>
-                <div className="relative">
+                    Confirm Password
+                  </label>
+                  <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Lock className="h-5 w-5 text-gray-400" />
                   </div>
@@ -440,8 +440,8 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
               </form>
             )}
           </div>
-        </div>
-      )}
+          </div>
+        )}
     </div>
   );
 }
