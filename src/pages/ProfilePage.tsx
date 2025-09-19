@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Membership } from '../types';
-import { membershipService } from '../lib/mockFirestoreService';
+import { membershipsService } from '../lib/firestoreServices';
 
 interface ProfilePageProps {
   onNavigate: (page: any) => void;
@@ -63,7 +63,7 @@ export default function ProfilePage({ onNavigate }: ProfilePageProps) {
     setLoading(true);
     try {
       // Get user's membership application
-      const memberships = await membershipService.getMemberships();
+      const memberships = await membershipsService.getMemberships();
       const userMembership = memberships.find(m => m.email === user?.email);
       
       if (userMembership) {
@@ -127,7 +127,7 @@ export default function ProfilePage({ onNavigate }: ProfilePageProps) {
     setError(null);
     
     try {
-      await membershipService.updateMembership(membership.id, {
+      await membershipsService.updateMembership(membership.id, {
         firstName: profileData.firstName,
         lastName: profileData.lastName,
         phone: profileData.phone,

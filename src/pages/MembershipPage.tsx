@@ -15,7 +15,7 @@ import {
   Globe
 } from 'lucide-react';
 import { Membership } from '../types';
-import { membershipService } from '../lib/mockFirestoreService';
+import { membershipsService } from '../lib/firestoreServices';
 
 interface MembershipPageProps {
   onNavigate: (page: string) => void;
@@ -121,7 +121,7 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
         submittedAt: new Date()
       };
 
-      await membershipService.addMembership(membershipData);
+      await membershipsService.addMembership(membershipData);
       setSubmitted(true);
     } catch (error) {
       console.error('Error submitting membership application:', error);

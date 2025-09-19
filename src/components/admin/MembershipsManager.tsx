@@ -19,7 +19,7 @@ import {
   FileText
 } from 'lucide-react';
 import { Membership } from '../../types';
-import { membershipService } from '../../lib/mockFirestoreService';
+import { membershipsService } from '../../lib/firestoreServices';
 
 interface MembershipsManagerProps {
   onClose: () => void;
@@ -40,7 +40,7 @@ export default function MembershipsManager({ onClose, onActivityUpdate }: Member
     setLoading(true);
     
     // Set up real-time subscription for memberships
-    const unsubscribe = membershipService.subscribeToMemberships((membershipsData) => {
+    const unsubscribe = membershipsService.subscribeToMemberships((membershipsData) => {
       setMemberships(membershipsData);
       setLoading(false);
     });
@@ -68,7 +68,7 @@ export default function MembershipsManager({ onClose, onActivityUpdate }: Member
 
   const handleStatusUpdate = async (id: string, status: 'approved' | 'rejected') => {
     try {
-      await membershipService.updateMembership(id, {
+      await membershipsService.updateMembership(id, {
         status,
         reviewedAt: new Date(),
         reviewedBy: 'Current Admin', // This would come from auth context
@@ -86,7 +86,7 @@ export default function MembershipsManager({ onClose, onActivityUpdate }: Member
   const handleDeleteMembership = async (id: string, name: string) => {
     if (window.confirm(`Are you sure you want to delete membership application from "${name}"?`)) {
       try {
-        await membershipService.deleteMembership(id);
+        await membershipsService.deleteMembership(id);
         onActivityUpdate?.('membership', 'Deleted', name);
       } catch (error) {
         console.error('Error deleting membership:', error);

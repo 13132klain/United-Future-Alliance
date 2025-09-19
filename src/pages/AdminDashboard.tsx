@@ -16,7 +16,8 @@ import CommunityManager from '../components/admin/CommunityManager';
 import SettingsManager from '../components/admin/SettingsManager';
 import FirebaseStatus from '../components/FirebaseStatus';
 import { eventsService, newsService, leadersService } from '../lib/firestoreServices';
-import { resourcesService, donationsService, membershipService } from '../lib/mockFirestoreService';
+import { resourcesService, donationsService } from '../lib/mockFirestoreService';
+import { membershipsService } from '../lib/firestoreServices';
 import { 
   LayoutDashboard, 
   Calendar, 
@@ -91,7 +92,7 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
         const unsubscribeDonations = donationsService.subscribeToDonations((donations) => {
           setStats(prev => ({ ...prev, totalDonations: donations.length }));
         });
-        const unsubscribeMemberships = membershipService.subscribeToMemberships((memberships) => {
+        const unsubscribeMemberships = membershipsService.subscribeToMemberships((memberships) => {
           setStats(prev => ({ ...prev, totalMemberships: memberships.length }));
         });
 
