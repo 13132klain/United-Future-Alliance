@@ -10,6 +10,7 @@ import MembershipPage from './pages/MembershipPage';
 import CommunityPage from './pages/CommunityPage';
 import AuthPage from './pages/AuthPage';
 import AdminDashboard from './pages/AdminDashboard';
+import ProfilePage from './pages/ProfilePage';
 import { AuthProvider } from './contexts/AuthContext';
 import { NavigationPage } from './types';
 
@@ -36,6 +37,8 @@ function App() {
         return <AuthPage mode="register" onNavigate={setCurrentPage} />;
       case 'admin':
         return <AdminDashboard onNavigate={setCurrentPage} />;
+      case 'profile':
+        return <ProfilePage onNavigate={setCurrentPage} />;
       case 'about':
         return (
           <div className="min-h-screen bg-gray-50 py-12">

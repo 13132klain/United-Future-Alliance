@@ -123,6 +123,14 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
                         <p className="text-xs text-gray-500">{user.email}</p>
                       </div>
                       
+                      <button
+                        onClick={() => handleNavigation('profile')}
+                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                      >
+                        <User className="w-4 h-4" />
+                        My Profile
+                      </button>
+                      
                       {user.role === 'admin' && (
                 <button
                           onClick={() => handleNavigation('admin')}
@@ -215,6 +223,14 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
                         <p className="text-xs text-gray-500">{user.email}</p>
                       </div>
                     </div>
+                    
+                    <button
+                      onClick={() => handleNavigation('profile')}
+                      className="flex items-center space-x-2 w-full px-3 py-2 text-sm font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-50 rounded-lg transition-colors"
+                    >
+                      <User className="w-4 h-4" />
+                      <span>My Profile</span>
+                    </button>
                     
                     {user.role === 'admin' && (
                       <button

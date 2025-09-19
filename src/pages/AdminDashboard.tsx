@@ -250,6 +250,21 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
+              <p className="text-sm font-medium text-gray-600">Membership Applications</p>
+              <p className="text-3xl font-bold text-gray-900">{stats.totalMemberships}</p>
+            </div>
+            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+              <Users className="w-6 h-6 text-purple-600" />
+            </div>
+          </div>
+          <div className="mt-4">
+            <span className="text-sm text-green-600 font-medium">+3 this week</span>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between">
+            <div>
               <p className="text-sm font-medium text-gray-600">Donations</p>
               <p className="text-3xl font-bold text-gray-900">{stats.totalDonations}</p>
             </div>
@@ -292,6 +307,31 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
           </div>
         </div>
       </div>
+
+      {/* Pending Memberships Alert */}
+      {stats.totalMemberships > 0 && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center mr-4">
+              <Users className="w-5 h-5 text-yellow-600" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-medium text-yellow-800">
+                Membership Applications Pending Review
+              </h3>
+              <p className="text-sm text-yellow-700 mt-1">
+                You have {stats.totalMemberships} membership application{stats.totalMemberships > 1 ? 's' : ''} that require your attention.
+              </p>
+            </div>
+            <button
+              onClick={() => setActiveTab('memberships')}
+              className="px-4 py-2 bg-yellow-600 text-white text-sm font-medium rounded-lg hover:bg-yellow-700 transition-colors"
+            >
+              Review Applications
+            </button>
+          </div>
+        </div>
+      )}
 
        {/* Recent Activity */}
        <div className="bg-white rounded-xl shadow-sm border border-gray-100">

@@ -129,6 +129,29 @@ export default function MembershipsManager({ onClose, onActivityUpdate }: Member
         </div>
       </div>
 
+      {/* Pending Applications Alert */}
+      {pendingCount > 0 && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <Clock className="w-5 h-5 text-yellow-600 mr-3" />
+            <div>
+              <h3 className="text-sm font-medium text-yellow-800">
+                {pendingCount} membership application{pendingCount > 1 ? 's' : ''} pending review
+              </h3>
+              <p className="text-sm text-yellow-700 mt-1">
+                New applications require your attention for approval or rejection.
+              </p>
+            </div>
+            <button
+              onClick={() => setStatusFilter('pending')}
+              className="ml-auto px-4 py-2 bg-yellow-600 text-white text-sm font-medium rounded-lg hover:bg-yellow-700 transition-colors"
+            >
+              Review Now
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
