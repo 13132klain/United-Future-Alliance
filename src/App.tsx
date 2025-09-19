@@ -18,6 +18,15 @@ import { NavigationPage } from './types';
 function App() {
   const [currentPage, setCurrentPage] = React.useState<NavigationPage>('home');
 
+  // Check for URL parameters to handle direct navigation
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const page = urlParams.get('page');
+    if (page && ['admin-test', 'admin', 'login', 'register', 'profile'].includes(page)) {
+      setCurrentPage(page as NavigationPage);
+    }
+  }, []);
+
   const renderPage = () => {
     switch (currentPage) {
       case 'home':
