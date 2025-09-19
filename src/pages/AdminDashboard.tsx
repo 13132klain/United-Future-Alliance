@@ -15,6 +15,7 @@ import ResearchManager from '../components/admin/ResearchManager';
 import CommunityManager from '../components/admin/CommunityManager';
 import SettingsManager from '../components/admin/SettingsManager';
 import FirebaseStatus from '../components/FirebaseStatus';
+import MembershipDebugger from '../components/MembershipDebugger';
 import { eventsService, newsService, leadersService } from '../lib/firestoreServices';
 import { resourcesService, donationsService } from '../lib/mockFirestoreService';
 import { membershipsService } from '../lib/firestoreServices';
@@ -421,13 +422,14 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
             return <ResearchManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
           case 'community':
             return <CommunityManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
-          case 'settings':
-            return (
-              <div className="space-y-6">
-                <FirebaseStatus />
-                <SettingsManager onClose={() => {}} />
-              </div>
-            );
+    case 'settings':
+      return (
+        <div className="space-y-6">
+          <FirebaseStatus />
+          <MembershipDebugger />
+          <SettingsManager onClose={() => {}} />
+        </div>
+      );
       default:
         return renderOverview();
     }
