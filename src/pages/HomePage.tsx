@@ -89,23 +89,6 @@ export default function HomePage({ onNavigate }: HomePageProps) {
 
   return (
     <div className="min-h-screen">
-      {/* Debug Section - Remove in production */}
-      <div className="bg-yellow-100 border-l-4 border-yellow-500 p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-yellow-800">
-              <strong>Debug:</strong> Having trouble accessing the admin dashboard?
-            </p>
-          </div>
-          <button
-            onClick={() => onNavigate('admin-test')}
-            className="px-3 py-1 bg-yellow-600 text-white text-sm rounded hover:bg-yellow-700 transition-colors"
-          >
-            Test Admin Access
-          </button>
-        </div>
-      </div>
-
       {/* Hero Section */}
       <section className="relative bg-white text-gray-900 overflow-hidden min-h-screen flex items-center">
         {/* Animated Background Elements */}

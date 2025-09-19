@@ -16,7 +16,6 @@ import CommunityManager from '../components/admin/CommunityManager';
 import SettingsManager from '../components/admin/SettingsManager';
 import FirebaseStatus from '../components/FirebaseStatus';
 import MembershipDebugger from '../components/MembershipDebugger';
-import AuthDebugger from '../components/AuthDebugger';
 import { eventsService, newsService, leadersService } from '../lib/firestoreServices';
 import { resourcesService, donationsService } from '../lib/mockFirestoreService';
 import { membershipsService } from '../lib/firestoreServices';
@@ -492,7 +491,6 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
     case 'settings':
       return (
         <div className="space-y-6">
-          <AuthDebugger />
           <FirebaseStatus />
           <MembershipDebugger />
           <SettingsManager onClose={() => {}} />
