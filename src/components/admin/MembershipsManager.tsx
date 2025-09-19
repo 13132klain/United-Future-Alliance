@@ -41,6 +41,8 @@ export default function MembershipsManager({ onClose, onActivityUpdate }: Member
     
     // Set up real-time subscription for memberships
     const unsubscribe = membershipsService.subscribeToMemberships((membershipsData) => {
+      console.log('📊 MembershipsManager received data:', membershipsData);
+      console.log('📊 Number of memberships:', membershipsData.length);
       setMemberships(membershipsData);
       setLoading(false);
     });

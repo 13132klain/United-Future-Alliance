@@ -15,6 +15,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { Event, NewsItem, Leader, Membership } from '../types';
+import { membershipService as mockMembershipService } from './mockFirestoreService';
 
 // Mock data for fallback mode
 let mockEvents: Event[] = [
@@ -507,53 +508,6 @@ export const leadersService = {
   }
 };
 
-// Mock membership data for fallback mode
-let mockMemberships: Membership[] = [
-  {
-    id: '1',
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    phone: '+254 700 000 001',
-    dateOfBirth: new Date('1990-01-15'),
-    gender: 'male',
-    county: 'Nairobi',
-    constituency: 'Westlands',
-    ward: 'Parklands',
-    occupation: 'Software Engineer',
-    organization: 'Tech Solutions Ltd',
-    interests: ['Civic Education', 'Youth Development'],
-    motivation: 'I want to contribute to Kenya\'s development through technology and civic engagement.',
-    howDidYouHear: 'Social Media',
-    isVolunteer: true,
-    volunteerAreas: ['Event Organization', 'Community Outreach'],
-    status: 'approved',
-    submittedAt: new Date('2024-01-10'),
-    reviewedAt: new Date('2024-01-12'),
-    reviewedBy: 'admin@ufa.org',
-    notes: 'Excellent candidate with strong technical background.'
-  },
-  {
-    id: '2',
-    firstName: 'Jane',
-    lastName: 'Smith',
-    email: 'jane.smith@example.com',
-    phone: '+254 700 000 002',
-    dateOfBirth: new Date('1985-05-20'),
-    gender: 'female',
-    county: 'Mombasa',
-    constituency: 'Mvita',
-    ward: 'Tudor',
-    occupation: 'Teacher',
-    organization: 'Mombasa Primary School',
-    interests: ['Education', 'Women Empowerment'],
-    motivation: 'Passionate about improving education quality in Kenya.',
-    howDidYouHear: 'Friend Recommendation',
-    isVolunteer: false,
-    status: 'pending',
-    submittedAt: new Date('2024-01-15')
-  }
-];
 
 // Membership Service
 export const membershipsService = {
@@ -561,7 +515,7 @@ export const membershipsService = {
   async getMemberships(): Promise<Membership[]> {
     if (!db) {
       console.log('Firestore not configured, using mock memberships data');
-      return [...mockMemberships];
+      return await mockMembershipService.getMemberships();
     }
     
     try {
@@ -579,20 +533,15 @@ export const membershipsService = {
     } catch (error) {
       console.error('Error fetching memberships from Firestore:', error);
       console.log('Falling back to mock data');
-      return [...mockMemberships];
+      return await mockMembershipService.getMemberships();
     }
   },
 
   // Add new membership
   async addMembership(membership: Omit<Membership, 'id'>): Promise<string> {
     if (!db) {
-      console.log('Firestore not configured, simulating add membership');
-      const newId = Date.now().toString();
-      mockMemberships.unshift({
-        id: newId,
-        ...membership
-      });
-      return newId;
+      console.log('Firestore not configured, using mock membership service');
+      return await mockMembershipService.addMembership(membership);
     }
     
     try {
@@ -606,25 +555,16 @@ export const membershipsService = {
       return docRef.id;
     } catch (error) {
       console.error('Error adding membership to Firestore:', error);
-      console.log('Simulating add membership');
-      const newId = Date.now().toString();
-      mockMemberships.unshift({
-        id: newId,
-        ...membership
-      });
-      return newId;
+      console.log('Falling back to mock membership service');
+      return await mockMembershipService.addMembership(membership);
     }
   },
 
   // Update membership
   async updateMembership(id: string, membership: Partial<Membership>): Promise<void> {
     if (!db) {
-      console.log('Firestore not configured, simulating update membership');
-      const index = mockMemberships.findIndex(m => m.id === id);
-      if (index !== -1) {
-        mockMemberships[index] = { ...mockMemberships[index], ...membership };
-      }
-      return;
+      console.log('Firestore not configured, using mock membership service');
+      return await mockMembershipService.updateMembership(id, membership);
     }
     
     try {
@@ -635,20 +575,16 @@ export const membershipsService = {
       });
     } catch (error) {
       console.error('Error updating membership in Firestore:', error);
-      console.log('Simulating update membership');
-      const index = mockMemberships.findIndex(m => m.id === id);
-      if (index !== -1) {
-        mockMemberships[index] = { ...mockMemberships[index], ...membership };
-      }
+      console.log('Falling back to mock membership service');
+      return await mockMembershipService.updateMembership(id, membership);
     }
   },
 
   // Delete membership
   async deleteMembership(id: string): Promise<void> {
     if (!db) {
-      console.log('Firestore not configured, simulating delete membership');
-      mockMemberships = mockMemberships.filter(m => m.id !== id);
-      return;
+      console.log('Firestore not configured, using mock membership service');
+      return await mockMembershipService.deleteMembership(id);
     }
     
     try {
@@ -656,8 +592,8 @@ export const membershipsService = {
       await deleteDoc(membershipRef);
     } catch (error) {
       console.error('Error deleting membership from Firestore:', error);
-      console.log('Simulating delete membership');
-      mockMemberships = mockMemberships.filter(m => m.id !== id);
+      console.log('Falling back to mock membership service');
+      return await mockMembershipService.deleteMembership(id);
     }
   },
 
@@ -665,13 +601,7 @@ export const membershipsService = {
   subscribeToMemberships(callback: (memberships: Membership[]) => void): () => void {
     if (!db) {
       console.log('Firestore not configured, using mock memberships subscription');
-      // Simulate real-time updates by calling callback immediately
-      callback([...mockMemberships]);
-      
-      // Return a no-op unsubscribe function
-      return () => {
-        console.log('Unsubscribing from mock memberships');
-      };
+      return mockMembershipService.subscribeToMemberships(callback);
     }
     
     const membershipsRef = collection(db, 'memberships');

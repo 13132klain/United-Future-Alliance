@@ -121,7 +121,8 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
         submittedAt: new Date()
       };
 
-      await membershipsService.addMembership(membershipData);
+      const membershipId = await membershipsService.addMembership(membershipData);
+      console.log('✅ Membership application submitted successfully with ID:', membershipId);
       setSubmitted(true);
     } catch (error) {
       console.error('Error submitting membership application:', error);
