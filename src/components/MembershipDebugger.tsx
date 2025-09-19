@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { membershipsService } from '../lib/firestoreServices';
+import indexedDBMembershipService from '../lib/indexedDBMembershipService';
 import { Membership } from '../types';
 
 const MembershipDebugger: React.FC = () => {
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({ total: 0, pending: 0, approved: 0, rejected: 0 });
   const [testForm, setTestForm] = useState({
     firstName: 'Test',
     lastName: 'User',
@@ -28,6 +30,11 @@ const MembershipDebugger: React.FC = () => {
       console.log('🔍 MembershipDebugger: Received data:', data);
       setMemberships(data);
       setLoading(false);
+    });
+
+    // Load stats
+    indexedDBMembershipService.getStats().then(stats => {
+      setStats(stats);
     });
 
     return () => {
@@ -58,12 +65,27 @@ const MembershipDebugger: React.FC = () => {
     setLoading(true);
     try {
       const data = await membershipsService.getMemberships();
+      const statsData = await indexedDBMembershipService.getStats();
       console.log('🔍 MembershipDebugger: Manual refresh result:', data);
       setMemberships(data);
+      setStats(statsData);
     } catch (error) {
       console.error('🔍 MembershipDebugger: Manual refresh failed:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleClearData = async () => {
+    if (window.confirm('Are you sure you want to clear all membership data from IndexedDB?')) {
+      try {
+        await indexedDBMembershipService.clearAllMemberships();
+        console.log('🔍 MembershipDebugger: All data cleared');
+        setMemberships([]);
+        setStats({ total: 0, pending: 0, approved: 0, rejected: 0 });
+      } catch (error) {
+        console.error('🔍 MembershipDebugger: Clear data failed:', error);
+      }
     }
   };
 
@@ -85,9 +107,35 @@ const MembershipDebugger: React.FC = () => {
         >
           Refresh Data
         </button>
+        <button
+          onClick={handleClearData}
+          className="ml-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+        >
+          Clear All Data
+        </button>
       </div>
 
       <div className="mb-4">
+        <h3 className="text-lg font-semibold mb-2">IndexedDB Statistics</h3>
+        <div className="grid grid-cols-4 gap-4 mb-4">
+          <div className="bg-blue-100 p-3 rounded">
+            <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
+            <div className="text-sm text-blue-800">Total</div>
+          </div>
+          <div className="bg-yellow-100 p-3 rounded">
+            <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+            <div className="text-sm text-yellow-800">Pending</div>
+          </div>
+          <div className="bg-green-100 p-3 rounded">
+            <div className="text-2xl font-bold text-green-600">{stats.approved}</div>
+            <div className="text-sm text-green-800">Approved</div>
+          </div>
+          <div className="bg-red-100 p-3 rounded">
+            <div className="text-2xl font-bold text-red-600">{stats.rejected}</div>
+            <div className="text-sm text-red-800">Rejected</div>
+          </div>
+        </div>
+        
         <h3 className="text-lg font-semibold mb-2">Current Memberships ({memberships.length})</h3>
         {loading ? (
           <p>Loading...</p>

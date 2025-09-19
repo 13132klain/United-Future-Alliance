@@ -15,7 +15,7 @@ import {
 } from 'firebase/firestore';
 import { db, isFirebaseConfigured, firebaseInitialized } from './firebase';
 import { Event, NewsItem, Leader, Membership } from '../types';
-import { membershipService as mockMembershipService } from './mockFirestoreService';
+import indexedDBMembershipService from './indexedDBMembershipService';
 
 // Mock data for fallback mode
 let mockEvents: Event[] = [
@@ -519,9 +519,9 @@ export const membershipsService = {
     console.log('🔍 firebaseInitialized:', firebaseInitialized);
     
     if (!firebaseInitialized || !db) {
-      console.log('✅ Firebase not properly initialized, using mock memberships data');
-      const result = await mockMembershipService.getMemberships();
-      console.log('✅ Mock memberships result:', result);
+      console.log('✅ Firebase not properly initialized, using IndexedDB for memberships');
+      const result = await indexedDBMembershipService.getMemberships();
+      console.log('✅ IndexedDB memberships result:', result);
       return result;
     }
     
@@ -539,8 +539,8 @@ export const membershipsService = {
       })) as Membership[];
     } catch (error) {
       console.error('Error fetching memberships from Firestore:', error);
-      console.log('Falling back to mock data');
-      return await mockMembershipService.getMemberships();
+      console.log('Falling back to IndexedDB');
+      return await indexedDBMembershipService.getMemberships();
     }
   },
 
@@ -552,9 +552,9 @@ export const membershipsService = {
     console.log('🔍 firebaseInitialized:', firebaseInitialized);
     
     if (!firebaseInitialized || !db) {
-      console.log('✅ Firebase not properly initialized, using mock membership service');
-      const result = await mockMembershipService.addMembership(membership);
-      console.log('✅ Mock addMembership result:', result);
+      console.log('✅ Firebase not properly initialized, using IndexedDB for membership');
+      const result = await indexedDBMembershipService.addMembership(membership);
+      console.log('✅ IndexedDB addMembership result:', result);
       return result;
     }
     
@@ -569,16 +569,16 @@ export const membershipsService = {
       return docRef.id;
     } catch (error) {
       console.error('Error adding membership to Firestore:', error);
-      console.log('Falling back to mock membership service');
-      return await mockMembershipService.addMembership(membership);
+      console.log('Falling back to IndexedDB');
+      return await indexedDBMembershipService.addMembership(membership);
     }
   },
 
   // Update membership
   async updateMembership(id: string, membership: Partial<Membership>): Promise<void> {
     if (!firebaseInitialized || !db) {
-      console.log('Firebase not properly initialized, using mock membership service');
-      return await mockMembershipService.updateMembership(id, membership);
+      console.log('Firebase not properly initialized, using IndexedDB for membership update');
+      return await indexedDBMembershipService.updateMembership(id, membership);
     }
     
     try {
@@ -589,16 +589,16 @@ export const membershipsService = {
       });
     } catch (error) {
       console.error('Error updating membership in Firestore:', error);
-      console.log('Falling back to mock membership service');
-      return await mockMembershipService.updateMembership(id, membership);
+      console.log('Falling back to IndexedDB');
+      return await indexedDBMembershipService.updateMembership(id, membership);
     }
   },
 
   // Delete membership
   async deleteMembership(id: string): Promise<void> {
     if (!firebaseInitialized || !db) {
-      console.log('Firebase not properly initialized, using mock membership service');
-      return await mockMembershipService.deleteMembership(id);
+      console.log('Firebase not properly initialized, using IndexedDB for membership deletion');
+      return await indexedDBMembershipService.deleteMembership(id);
     }
     
     try {
@@ -606,8 +606,8 @@ export const membershipsService = {
       await deleteDoc(membershipRef);
     } catch (error) {
       console.error('Error deleting membership from Firestore:', error);
-      console.log('Falling back to mock membership service');
-      return await mockMembershipService.deleteMembership(id);
+      console.log('Falling back to IndexedDB');
+      return await indexedDBMembershipService.deleteMembership(id);
     }
   },
 
@@ -619,9 +619,9 @@ export const membershipsService = {
     console.log('🔍 firebaseInitialized:', firebaseInitialized);
     
     if (!firebaseInitialized || !db) {
-      console.log('✅ Firebase not properly initialized, using mock memberships subscription');
-      const unsubscribe = mockMembershipService.subscribeToMemberships(callback);
-      console.log('✅ Mock subscription set up, unsubscribe function:', unsubscribe);
+      console.log('✅ Firebase not properly initialized, using IndexedDB subscription');
+      const unsubscribe = indexedDBMembershipService.subscribeToMemberships(callback);
+      console.log('✅ IndexedDB subscription set up, unsubscribe function:', unsubscribe);
       return unsubscribe;
     }
     
