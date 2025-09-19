@@ -11,6 +11,7 @@ import CommunityPage from './pages/CommunityPage';
 import AuthPage from './pages/AuthPage';
 import AdminDashboard from './pages/AdminDashboard';
 import ProfilePage from './pages/ProfilePage';
+import AdminAccessTest from './components/AdminAccessTest';
 import { AuthProvider } from './contexts/AuthContext';
 import { NavigationPage } from './types';
 
@@ -39,6 +40,8 @@ function App() {
         return <AdminDashboard onNavigate={setCurrentPage} />;
       case 'profile':
         return <ProfilePage onNavigate={setCurrentPage} />;
+      case 'admin-test':
+        return <AdminAccessTest />;
       case 'about':
         return (
           <div className="min-h-screen bg-gray-50 py-12">

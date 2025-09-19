@@ -124,4 +124,4 @@ export interface Membership {
   notes?: string;
 }
 
-export type NavigationPage = 'home' | 'about' | 'events' | 'community' | 'resources' | 'leadership' | 'donate' | 'membership' | 'login' | 'register' | 'admin' | 'profile';
+export type NavigationPage = 'home' | 'about' | 'events' | 'community' | 'resources' | 'leadership' | 'donate' | 'membership' | 'login' | 'register' | 'admin' | 'profile' | 'admin-test';

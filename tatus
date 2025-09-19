@@ -1,0 +1,33 @@
+[33mcommit c7bc338d2af7db775da69608b0b4d1673bfa26dd[m
+Author: omondiklein <newton@example.com>
+Date:   Fri Sep 19 13:33:36 2025 +0300
+
+    fix: Resolve Firebase initialization issue causing membership service to fail
+    
+     Root Cause Identified:
+    - Firebase was configured but failing to initialize due to CORS policy errors
+    - Membership service was trying to use Firebase instead of mock service
+    - Cross-Origin-Opener-Policy errors preventing proper Firebase initialization
+    
+     Solution Implemented:
+    - Added firebaseInitialized flag to track successful Firebase initialization
+    - Enhanced Firebase initialization error handling
+    - Updated membership service to check firebaseInitialized flag
+    - Proper fallback to mock service when Firebase initialization fails
+    
+     Technical Changes:
+    - firebase.ts: Added firebaseInitialized flag and error handling
+    - firestoreServices.ts: Updated all membership functions to check firebaseInitialized
+    - Better debugging with firebaseInitialized status logging
+    - Graceful fallback when Firebase fails to initialize
+    
+     Expected Result:
+    - Membership applications now use mock service when Firebase fails
+    - Real-time updates work correctly in mock mode
+    - No more Firebase CORS errors affecting membership functionality
+    - Applications appear immediately in admin dashboard
+    
+    This fixes the core issue where Firebase configuration was present but failing, causing the membership service to break.
+
+src/lib/firebase.ts
+src/lib/firestoreServices.ts

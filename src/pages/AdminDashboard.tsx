@@ -16,6 +16,7 @@ import CommunityManager from '../components/admin/CommunityManager';
 import SettingsManager from '../components/admin/SettingsManager';
 import FirebaseStatus from '../components/FirebaseStatus';
 import MembershipDebugger from '../components/MembershipDebugger';
+import AuthDebugger from '../components/AuthDebugger';
 import { eventsService, newsService, leadersService } from '../lib/firestoreServices';
 import { resourcesService, donationsService } from '../lib/mockFirestoreService';
 import { membershipsService } from '../lib/firestoreServices';
@@ -49,9 +50,75 @@ interface AdminDashboardProps {
 type DashboardTab = 'overview' | 'events' | 'news' | 'leaders' | 'resources' | 'donations' | 'memberships' | 'constitution' | 'voter-guide' | 'action-toolkit' | 'digital-guide' | 'research' | 'community' | 'settings';
 
 export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState<DashboardTab>('overview');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if user is authenticated and is admin
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
+          <p className="text-gray-600 mb-6">Please log in to access the admin dashboard.</p>
+          <button
+            onClick={() => onNavigate('login')}
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (user.role !== 'admin') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
+          <p className="text-gray-600 mb-2">You don't have admin privileges.</p>
+          <p className="text-sm text-gray-500 mb-6">Current user: {user.email} (Role: {user.role})</p>
+          <div className="space-x-4">
+            <button
+              onClick={() => onNavigate('home')}
+              className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              Go Home
+            </button>
+            <button
+              onClick={() => onNavigate('profile')}
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              My Profile
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Real-time data from services
   const [stats, setStats] = useState({
@@ -425,6 +492,7 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
     case 'settings':
       return (
         <div className="space-y-6">
+          <AuthDebugger />
           <FirebaseStatus />
           <MembershipDebugger />
           <SettingsManager onClose={() => {}} />
