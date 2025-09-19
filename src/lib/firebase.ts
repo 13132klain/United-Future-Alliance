@@ -30,6 +30,7 @@ let app: any = null;
 let auth: any = null;
 let db: any = null;
 let storage: any = null;
+let firebaseInitialized = false;
 
 if (isFirebaseConfigured()) {
   try {
@@ -40,6 +41,8 @@ if (isFirebaseConfigured()) {
     auth = getAuth(app);
     db = getFirestore(app);
     storage = getStorage(app);
+    
+    firebaseInitialized = true;
 
     // Connect to emulators in development (optional)
     if (import.meta.env.DEV && import.meta.env.VITE_USE_FIREBASE_EMULATOR === 'true') {
@@ -73,6 +76,11 @@ if (isFirebaseConfigured()) {
     });
   } catch (error) {
     console.error('❌ Firebase initialization failed:', error);
+    console.log('🔄 Falling back to mock services due to Firebase initialization failure');
+    firebaseInitialized = false;
+    db = null;
+    auth = null;
+    storage = null;
   }
 } else {
   console.log('⚠️ Firebase not configured - check your environment variables');
@@ -93,7 +101,7 @@ googleProvider.setCustomParameters({
 });
 
 // Export Firebase services
-export { app, auth, db, storage, googleProvider, isFirebaseConfigured };
+export { app, auth, db, storage, googleProvider, isFirebaseConfigured, firebaseInitialized };
 
 // Export Firebase types for convenience
 export type { User as FirebaseUser } from 'firebase/auth';

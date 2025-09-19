@@ -13,7 +13,7 @@ import {
   where,
   serverTimestamp
 } from 'firebase/firestore';
-import { db, isFirebaseConfigured } from './firebase';
+import { db, isFirebaseConfigured, firebaseInitialized } from './firebase';
 import { Event, NewsItem, Leader, Membership } from '../types';
 import { membershipService as mockMembershipService } from './mockFirestoreService';
 
@@ -516,9 +516,10 @@ export const membershipsService = {
     console.log('🔍 membershipsService.getMemberships called');
     console.log('🔍 db value:', db);
     console.log('🔍 isFirebaseConfigured():', isFirebaseConfigured());
+    console.log('🔍 firebaseInitialized:', firebaseInitialized);
     
-    if (!db) {
-      console.log('✅ Firestore not configured, using mock memberships data');
+    if (!firebaseInitialized || !db) {
+      console.log('✅ Firebase not properly initialized, using mock memberships data');
       const result = await mockMembershipService.getMemberships();
       console.log('✅ Mock memberships result:', result);
       return result;
@@ -548,9 +549,10 @@ export const membershipsService = {
     console.log('🔍 membershipsService.addMembership called with:', membership);
     console.log('🔍 db value:', db);
     console.log('🔍 isFirebaseConfigured():', isFirebaseConfigured());
+    console.log('🔍 firebaseInitialized:', firebaseInitialized);
     
-    if (!db) {
-      console.log('✅ Firestore not configured, using mock membership service');
+    if (!firebaseInitialized || !db) {
+      console.log('✅ Firebase not properly initialized, using mock membership service');
       const result = await mockMembershipService.addMembership(membership);
       console.log('✅ Mock addMembership result:', result);
       return result;
@@ -574,8 +576,8 @@ export const membershipsService = {
 
   // Update membership
   async updateMembership(id: string, membership: Partial<Membership>): Promise<void> {
-    if (!db) {
-      console.log('Firestore not configured, using mock membership service');
+    if (!firebaseInitialized || !db) {
+      console.log('Firebase not properly initialized, using mock membership service');
       return await mockMembershipService.updateMembership(id, membership);
     }
     
@@ -594,8 +596,8 @@ export const membershipsService = {
 
   // Delete membership
   async deleteMembership(id: string): Promise<void> {
-    if (!db) {
-      console.log('Firestore not configured, using mock membership service');
+    if (!firebaseInitialized || !db) {
+      console.log('Firebase not properly initialized, using mock membership service');
       return await mockMembershipService.deleteMembership(id);
     }
     
@@ -614,9 +616,10 @@ export const membershipsService = {
     console.log('🔍 membershipsService.subscribeToMemberships called');
     console.log('🔍 db value:', db);
     console.log('🔍 isFirebaseConfigured():', isFirebaseConfigured());
+    console.log('🔍 firebaseInitialized:', firebaseInitialized);
     
-    if (!db) {
-      console.log('✅ Firestore not configured, using mock memberships subscription');
+    if (!firebaseInitialized || !db) {
+      console.log('✅ Firebase not properly initialized, using mock memberships subscription');
       const unsubscribe = mockMembershipService.subscribeToMemberships(callback);
       console.log('✅ Mock subscription set up, unsubscribe function:', unsubscribe);
       return unsubscribe;
