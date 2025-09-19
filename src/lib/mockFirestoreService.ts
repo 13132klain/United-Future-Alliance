@@ -709,17 +709,23 @@ export const membershipService = {
   },
 
   async addMembership(membership: Omit<Membership, 'id'>): Promise<string> {
-    console.log('Adding mock membership:', membership);
+    console.log('🔍 mockMembershipService.addMembership called with:', membership);
     const newId = Date.now().toString();
     const newMembership: Membership = {
       id: newId,
       ...membership
     };
     mockMemberships.unshift(newMembership);
+    console.log('🔍 mockMemberships after adding:', mockMemberships);
+    console.log('🔍 Number of subscribers to notify:', membershipSubscribers.length);
     
     // Notify all subscribers
-    membershipSubscribers.forEach(callback => callback([...mockMemberships]));
+    membershipSubscribers.forEach((callback, index) => {
+      console.log(`🔍 Notifying subscriber ${index}:`, callback);
+      callback([...mockMemberships]);
+    });
     
+    console.log('✅ Mock membership added with ID:', newId);
     return newId;
   },
 
@@ -743,19 +749,25 @@ export const membershipService = {
   },
 
   subscribeToMemberships(callback: (memberships: Membership[]) => void): () => void {
-    console.log('Setting up mock memberships subscription');
+    console.log('🔍 mockMembershipService.subscribeToMemberships called');
+    console.log('🔍 Current mockMemberships:', mockMemberships);
+    console.log('🔍 Number of existing subscribers:', membershipSubscribers.length);
+    
     // Simulate real-time updates by calling callback immediately
+    console.log('🔍 Calling callback immediately with:', [...mockMemberships]);
     callback([...mockMemberships]);
     
     // Store callback for future updates
     membershipSubscribers.push(callback);
+    console.log('🔍 Callback added, total subscribers:', membershipSubscribers.length);
     
     // Return unsubscribe function
     return () => {
-      console.log('Unsubscribing from mock memberships');
+      console.log('🔍 Unsubscribing from mock memberships');
       const index = membershipSubscribers.indexOf(callback);
       if (index > -1) {
         membershipSubscribers.splice(index, 1);
+        console.log('🔍 Callback removed, remaining subscribers:', membershipSubscribers.length);
       }
     };
   }

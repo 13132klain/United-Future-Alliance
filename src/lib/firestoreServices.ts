@@ -13,7 +13,7 @@ import {
   where,
   serverTimestamp
 } from 'firebase/firestore';
-import { db } from './firebase';
+import { db, isFirebaseConfigured } from './firebase';
 import { Event, NewsItem, Leader, Membership } from '../types';
 import { membershipService as mockMembershipService } from './mockFirestoreService';
 
@@ -513,9 +513,15 @@ export const leadersService = {
 export const membershipsService = {
   // Get all memberships
   async getMemberships(): Promise<Membership[]> {
+    console.log('🔍 membershipsService.getMemberships called');
+    console.log('🔍 db value:', db);
+    console.log('🔍 isFirebaseConfigured():', isFirebaseConfigured());
+    
     if (!db) {
-      console.log('Firestore not configured, using mock memberships data');
-      return await mockMembershipService.getMemberships();
+      console.log('✅ Firestore not configured, using mock memberships data');
+      const result = await mockMembershipService.getMemberships();
+      console.log('✅ Mock memberships result:', result);
+      return result;
     }
     
     try {
@@ -539,9 +545,15 @@ export const membershipsService = {
 
   // Add new membership
   async addMembership(membership: Omit<Membership, 'id'>): Promise<string> {
+    console.log('🔍 membershipsService.addMembership called with:', membership);
+    console.log('🔍 db value:', db);
+    console.log('🔍 isFirebaseConfigured():', isFirebaseConfigured());
+    
     if (!db) {
-      console.log('Firestore not configured, using mock membership service');
-      return await mockMembershipService.addMembership(membership);
+      console.log('✅ Firestore not configured, using mock membership service');
+      const result = await mockMembershipService.addMembership(membership);
+      console.log('✅ Mock addMembership result:', result);
+      return result;
     }
     
     try {
@@ -599,9 +611,15 @@ export const membershipsService = {
 
   // Subscribe to memberships for real-time updates
   subscribeToMemberships(callback: (memberships: Membership[]) => void): () => void {
+    console.log('🔍 membershipsService.subscribeToMemberships called');
+    console.log('🔍 db value:', db);
+    console.log('🔍 isFirebaseConfigured():', isFirebaseConfigured());
+    
     if (!db) {
-      console.log('Firestore not configured, using mock memberships subscription');
-      return mockMembershipService.subscribeToMemberships(callback);
+      console.log('✅ Firestore not configured, using mock memberships subscription');
+      const unsubscribe = mockMembershipService.subscribeToMemberships(callback);
+      console.log('✅ Mock subscription set up, unsubscribe function:', unsubscribe);
+      return unsubscribe;
     }
     
     const membershipsRef = collection(db, 'memberships');
