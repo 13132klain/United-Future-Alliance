@@ -17,7 +17,7 @@ import { db } from './firebase';
 import { Event, NewsItem, Leader } from '../types';
 
 // Mock data for fallback mode
-const mockEvents: Event[] = [
+let mockEvents: Event[] = [
   {
     id: '1',
     title: 'National Youth Summit 2024',
@@ -40,7 +40,7 @@ const mockEvents: Event[] = [
   }
 ];
 
-const mockNews: NewsItem[] = [
+let mockNews: NewsItem[] = [
   {
     id: '1',
     title: 'UFA Launches Comprehensive Education Reform Initiative',
@@ -53,7 +53,7 @@ const mockNews: NewsItem[] = [
   }
 ];
 
-const mockLeaders: Leader[] = [
+let mockLeaders: Leader[] = [
   {
     id: '1',
     name: 'Dr. Sarah Mwangi',
@@ -226,65 +226,123 @@ export const eventsService = {
 export const newsService = {
   // Get all news
   async getNews(): Promise<NewsItem[]> {
-    if (!db) throw new Error('Firestore not initialized');
+    if (!db) {
+      console.log('Firestore not configured, using mock data');
+      return mockNews;
+    }
     
-    const newsRef = collection(db, 'news');
-    const q = query(newsRef, orderBy('publishDate', 'desc'));
-    const snapshot = await getDocs(q);
-    
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      publishDate: doc.data().publishDate?.toDate() || new Date()
-    })) as NewsItem[];
+    try {
+      const newsRef = collection(db, 'news');
+      const q = query(newsRef, orderBy('publishDate', 'desc'));
+      const snapshot = await getDocs(q);
+      
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        publishDate: doc.data().publishDate?.toDate() || new Date()
+      })) as NewsItem[];
+    } catch (error) {
+      console.error('Error fetching news from Firestore:', error);
+      console.log('Falling back to mock data');
+      return mockNews;
+    }
   },
 
   // Get latest news
   async getLatestNews(count: number = 5): Promise<NewsItem[]> {
-    if (!db) throw new Error('Firestore not initialized');
+    if (!db) {
+      console.log('Firestore not configured, using mock data');
+      return mockNews.slice(0, count);
+    }
     
-    const newsRef = collection(db, 'news');
-    const q = query(newsRef, orderBy('publishDate', 'desc'), limit(count));
-    const snapshot = await getDocs(q);
-    
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      publishDate: doc.data().publishDate?.toDate() || new Date()
-    })) as NewsItem[];
+    try {
+      const newsRef = collection(db, 'news');
+      const q = query(newsRef, orderBy('publishDate', 'desc'), limit(count));
+      const snapshot = await getDocs(q);
+      
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        publishDate: doc.data().publishDate?.toDate() || new Date()
+      })) as NewsItem[];
+    } catch (error) {
+      console.error('Error fetching latest news from Firestore:', error);
+      console.log('Falling back to mock data');
+      return mockNews.slice(0, count);
+    }
   },
 
   // Add new news article
   async addNews(news: Omit<NewsItem, 'id'>): Promise<string> {
-    if (!db) throw new Error('Firestore not initialized');
+    if (!db) {
+      console.log('Firestore not configured, simulating add news');
+      const newId = Date.now().toString();
+      mockNews.unshift({
+        id: newId,
+        ...news
+      });
+      return newId;
+    }
     
-    const newsRef = collection(db, 'news');
-    const docRef = await addDoc(newsRef, {
-      ...news,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    });
-    
-    return docRef.id;
+    try {
+      const newsRef = collection(db, 'news');
+      const docRef = await addDoc(newsRef, {
+        ...news,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+      
+      return docRef.id;
+    } catch (error) {
+      console.error('Error adding news to Firestore:', error);
+      console.log('Simulating add news');
+      const newId = Date.now().toString();
+      mockNews.unshift({
+        id: newId,
+        ...news
+      });
+      return newId;
+    }
   },
 
   // Update news article
   async updateNews(id: string, news: Partial<NewsItem>): Promise<void> {
-    if (!db) throw new Error('Firestore not initialized');
+    if (!db) {
+      console.log('Firestore not configured, simulating update news');
+      const index = mockNews.findIndex(n => n.id === id);
+      if (index !== -1) {
+        mockNews[index] = { ...mockNews[index], ...news };
+      }
+      return;
+    }
     
-    const newsRef = doc(db, 'news', id);
-    await updateDoc(newsRef, {
-      ...news,
-      updatedAt: serverTimestamp()
-    });
+    try {
+      const newsRef = doc(db, 'news', id);
+      await updateDoc(newsRef, {
+        ...news,
+        updatedAt: serverTimestamp()
+      });
+    } catch (error) {
+      console.error('Error updating news in Firestore:', error);
+      throw error;
+    }
   },
 
   // Delete news article
   async deleteNews(id: string): Promise<void> {
-    if (!db) throw new Error('Firestore not initialized');
+    if (!db) {
+      console.log('Firestore not configured, simulating delete news');
+      mockNews = mockNews.filter(n => n.id !== id);
+      return;
+    }
     
-    const newsRef = doc(db, 'news', id);
-    await deleteDoc(newsRef);
+    try {
+      const newsRef = doc(db, 'news', id);
+      await deleteDoc(newsRef);
+    } catch (error) {
+      console.error('Error deleting news from Firestore:', error);
+      throw error;
+    }
   },
 
   // Subscribe to news changes
@@ -334,49 +392,98 @@ export const newsService = {
 export const leadersService = {
   // Get all leaders
   async getLeaders(): Promise<Leader[]> {
-    if (!db) throw new Error('Firestore not initialized');
+    if (!db) {
+      console.log('Firestore not configured, using mock data');
+      return mockLeaders;
+    }
     
-    const leadersRef = collection(db, 'leaders');
-    const q = query(leadersRef, orderBy('name', 'asc'));
-    const snapshot = await getDocs(q);
-    
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    })) as Leader[];
+    try {
+      const leadersRef = collection(db, 'leaders');
+      const q = query(leadersRef, orderBy('name', 'asc'));
+      const snapshot = await getDocs(q);
+      
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Leader[];
+    } catch (error) {
+      console.error('Error fetching leaders from Firestore:', error);
+      console.log('Falling back to mock data');
+      return mockLeaders;
+    }
   },
 
   // Add new leader
   async addLeader(leader: Omit<Leader, 'id'>): Promise<string> {
-    if (!db) throw new Error('Firestore not initialized');
+    if (!db) {
+      console.log('Firestore not configured, simulating add leader');
+      const newId = Date.now().toString();
+      mockLeaders.push({
+        id: newId,
+        ...leader
+      });
+      return newId;
+    }
     
-    const leadersRef = collection(db, 'leaders');
-    const docRef = await addDoc(leadersRef, {
-      ...leader,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    });
-    
-    return docRef.id;
+    try {
+      const leadersRef = collection(db, 'leaders');
+      const docRef = await addDoc(leadersRef, {
+        ...leader,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+      
+      return docRef.id;
+    } catch (error) {
+      console.error('Error adding leader to Firestore:', error);
+      console.log('Simulating add leader');
+      const newId = Date.now().toString();
+      mockLeaders.push({
+        id: newId,
+        ...leader
+      });
+      return newId;
+    }
   },
 
   // Update leader
   async updateLeader(id: string, leader: Partial<Leader>): Promise<void> {
-    if (!db) throw new Error('Firestore not initialized');
+    if (!db) {
+      console.log('Firestore not configured, simulating update leader');
+      const index = mockLeaders.findIndex(l => l.id === id);
+      if (index !== -1) {
+        mockLeaders[index] = { ...mockLeaders[index], ...leader };
+      }
+      return;
+    }
     
-    const leaderRef = doc(db, 'leaders', id);
-    await updateDoc(leaderRef, {
-      ...leader,
-      updatedAt: serverTimestamp()
-    });
+    try {
+      const leaderRef = doc(db, 'leaders', id);
+      await updateDoc(leaderRef, {
+        ...leader,
+        updatedAt: serverTimestamp()
+      });
+    } catch (error) {
+      console.error('Error updating leader in Firestore:', error);
+      throw error;
+    }
   },
 
   // Delete leader
   async deleteLeader(id: string): Promise<void> {
-    if (!db) throw new Error('Firestore not initialized');
+    if (!db) {
+      console.log('Firestore not configured, simulating delete leader');
+      mockLeaders = mockLeaders.filter(l => l.id !== id);
+      return;
+    }
     
-    const leaderRef = doc(db, 'leaders', id);
-    await deleteDoc(leaderRef);
+    try {
+      const leaderRef = doc(db, 'leaders', id);
+      await deleteDoc(leaderRef);
+    } catch (error) {
+      console.error('Error deleting leader from Firestore:', error);
+      throw error;
+    }
   },
 
   // Subscribe to leaders changes

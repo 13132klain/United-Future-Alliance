@@ -6,8 +6,16 @@ import NewsManager from '../components/admin/NewsManager';
 import LeadersManager from '../components/admin/LeadersManager';
 import ResourcesManager from '../components/admin/ResourcesManager';
 import DonationsManager from '../components/admin/DonationsManager';
+import MembershipsManager from '../components/admin/MembershipsManager';
+import ConstitutionManager from '../components/admin/ConstitutionManager';
+import VoterGuideManager from '../components/admin/VoterGuideManager';
+import ActionToolkitManager from '../components/admin/ActionToolkitManager';
+import DigitalGuideManager from '../components/admin/DigitalGuideManager';
+import ResearchManager from '../components/admin/ResearchManager';
 import SettingsManager from '../components/admin/SettingsManager';
-import { eventsService, newsService, leadersService, resourcesService, donationsService } from '../lib/mockFirestoreService';
+import FirebaseStatus from '../components/FirebaseStatus';
+import { eventsService, newsService, leadersService } from '../lib/firestoreServices';
+import { resourcesService, donationsService, membershipService } from '../lib/mockFirestoreService';
 import { 
   LayoutDashboard, 
   Calendar, 
@@ -20,6 +28,8 @@ import {
   BarChart3,
   Bell,
   Search,
+  Shield,
+  BookOpen,
   Filter,
   MoreVertical,
   Edit,
@@ -33,7 +43,7 @@ interface AdminDashboardProps {
   onNavigate: (page: NavigationPage) => void;
 }
 
-type DashboardTab = 'overview' | 'events' | 'news' | 'leaders' | 'resources' | 'donations' | 'settings';
+type DashboardTab = 'overview' | 'events' | 'news' | 'leaders' | 'resources' | 'donations' | 'memberships' | 'constitution' | 'voter-guide' | 'action-toolkit' | 'digital-guide' | 'research' | 'settings';
 
 export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
   const { user } = useAuth();
@@ -47,6 +57,7 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
     totalLeaders: 0,
     totalResources: 0,
     totalDonations: 0,
+    totalMemberships: 0,
     totalUsers: 1247 // This would come from user service in a real app
   });
 
@@ -76,17 +87,21 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
       setStats(prev => ({ ...prev, totalResources: resources.length }));
     });
 
-    const unsubscribeDonations = donationsService.subscribeToDonations((donations) => {
-      setStats(prev => ({ ...prev, totalDonations: donations.length }));
-    });
+        const unsubscribeDonations = donationsService.subscribeToDonations((donations) => {
+          setStats(prev => ({ ...prev, totalDonations: donations.length }));
+        });
+        const unsubscribeMemberships = membershipService.subscribeToMemberships((memberships) => {
+          setStats(prev => ({ ...prev, totalMemberships: memberships.length }));
+        });
 
-    return () => {
-      unsubscribeEvents();
-      unsubscribeNews();
-      unsubscribeLeaders();
-      unsubscribeResources();
-      unsubscribeDonations();
-    };
+        return () => {
+          unsubscribeEvents();
+          unsubscribeNews();
+          unsubscribeLeaders();
+          unsubscribeResources();
+          unsubscribeDonations();
+          unsubscribeMemberships();
+        };
   }, []);
 
   // Function to add recent activity (called by child components)
@@ -140,19 +155,25 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
     { id: 'events', label: 'Events', icon: Calendar },
     { id: 'news', label: 'News', icon: Newspaper },
     { id: 'leaders', label: 'Leaders', icon: Users },
-    { id: 'resources', label: 'Resources', icon: FileText },
-    { id: 'donations', label: 'Donations', icon: Heart },
+    { id: 'resources', label: 'Resources', icon: FileText }, 
+    { id: 'donations', label: 'Donations', icon: Heart },   
+    { id: 'memberships', label: 'Memberships', icon: Users },
+    { id: 'constitution', label: 'Constitution', icon: FileText },
+    { id: 'voter-guide', label: 'Voter Guide', icon: Users },
+    { id: 'action-toolkit', label: 'Action Toolkit', icon: FileText },
+    { id: 'digital-guide', label: 'Digital Guide', icon: Shield },
+    { id: 'research', label: 'Research', icon: BookOpen },
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
   const renderOverview = () => (
     <div className="space-y-6">
       {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-emerald-600 to-blue-600 rounded-xl p-6 text-white">
+      <div className="bg-gradient-to-r from-red-600 to-blue-600 rounded-xl p-6 text-white">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold mb-2">Welcome back, {user?.name}!</h2>
-            <p className="text-emerald-100">Here's what's happening with UFA today.</p>
+            <p className="text-red-100">Here's what's happening with UFA today.</p>
           </div>
           <div className="hidden md:block">
             <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
@@ -163,15 +184,15 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
       </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-6">
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Events</p>
               <p className="text-3xl font-bold text-gray-900">{stats.totalEvents}</p>
             </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Calendar className="w-6 h-6 text-blue-600" />
+            <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+              <Calendar className="w-6 h-6 text-red-600" />
             </div>
           </div>
           <div className="mt-4">
@@ -185,8 +206,8 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
               <p className="text-sm font-medium text-gray-600">News Articles</p>
               <p className="text-3xl font-bold text-gray-900">{stats.totalNews}</p>
             </div>
-            <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
-              <Newspaper className="w-6 h-6 text-emerald-600" />
+            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+              <Newspaper className="w-6 h-6 text-blue-600" />
             </div>
           </div>
           <div className="mt-4">
@@ -200,8 +221,8 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
               <p className="text-sm font-medium text-gray-600">Leaders</p>
               <p className="text-3xl font-bold text-gray-900">{stats.totalLeaders}</p>
             </div>
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-              <Users className="w-6 h-6 text-purple-600" />
+            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+              <Users className="w-6 h-6 text-green-600" />
             </div>
           </div>
           <div className="mt-4">
@@ -215,8 +236,8 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
               <p className="text-sm font-medium text-gray-600">Resources</p>
               <p className="text-3xl font-bold text-gray-900">{stats.totalResources}</p>
             </div>
-            <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
-              <FileText className="w-6 h-6 text-indigo-600" />
+            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+              <FileText className="w-6 h-6 text-blue-600" />
             </div>
           </div>
           <div className="mt-4">
@@ -236,6 +257,21 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
           </div>
           <div className="mt-4">
             <span className="text-sm text-green-600 font-medium">+12 this week</span>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Memberships</p>
+              <p className="text-3xl font-bold text-gray-900">{stats.totalMemberships}</p>
+            </div>
+            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+              <Users className="w-6 h-6 text-blue-600" />
+            </div>
+          </div>
+          <div className="mt-4">
+            <span className="text-sm text-green-600 font-medium">+3 this week</span>
           </div>
         </div>
 
@@ -326,10 +362,27 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
         return <LeadersManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
       case 'resources':
         return <ResourcesManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
-      case 'donations':
-        return <DonationsManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
-      case 'settings':
-        return <SettingsManager onClose={() => {}} />;
+          case 'donations':
+            return <DonationsManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
+          case 'memberships':
+            return <MembershipsManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
+          case 'constitution':
+            return <ConstitutionManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
+          case 'voter-guide':
+            return <VoterGuideManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
+          case 'action-toolkit':
+            return <ActionToolkitManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
+          case 'digital-guide':
+            return <DigitalGuideManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
+          case 'research':
+            return <ResearchManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
+          case 'settings':
+            return (
+              <div className="space-y-6">
+                <FirebaseStatus />
+                <SettingsManager onClose={() => {}} />
+              </div>
+            );
       default:
         return renderOverview();
     }

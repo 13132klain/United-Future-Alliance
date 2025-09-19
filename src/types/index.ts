@@ -99,4 +99,29 @@ export interface User {
   role?: 'user' | 'admin';
 }
 
-export type NavigationPage = 'home' | 'about' | 'events' | 'community' | 'resources' | 'leadership' | 'donate' | 'login' | 'register' | 'admin';
+export interface Membership {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  dateOfBirth: Date;
+  gender: 'male' | 'female' | 'other';
+  county: string;
+  constituency: string;
+  ward?: string;
+  occupation: string;
+  organization?: string;
+  interests: string[];
+  motivation: string;
+  howDidYouHear: string;
+  isVolunteer: boolean;
+  volunteerAreas?: string[];
+  status: 'pending' | 'approved' | 'rejected';
+  submittedAt: Date;
+  reviewedAt?: Date;
+  reviewedBy?: string;
+  notes?: string;
+}
+
+export type NavigationPage = 'home' | 'about' | 'events' | 'community' | 'resources' | 'leadership' | 'donate' | 'membership' | 'login' | 'register' | 'admin';

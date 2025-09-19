@@ -9,7 +9,7 @@ export default function Footer() {
           {/* About Section */}
           <div>
             <div className="flex items-center mb-6">
-              <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold">
+              <div className="bg-gradient-to-br from-red-500 to-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold">
                 UFA
               </div>
               <span className="ml-3 text-lg font-bold">United Future Alliance</span>
@@ -19,13 +19,13 @@ export default function Footer() {
               social justice, and economic empowerment.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-emerald-400 transition-colors">
+              <a href="#" className="text-gray-400 hover:text-red-400 transition-colors">
                 <Facebook className="w-5 h-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-emerald-400 transition-colors">
+              <a href="#" className="text-gray-400 hover:text-red-400 transition-colors">
                 <Twitter className="w-5 h-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-emerald-400 transition-colors">
+              <a href="#" className="text-gray-400 hover:text-red-400 transition-colors">
                 <Instagram className="w-5 h-5" />
               </a>
             </div>
@@ -33,11 +33,11 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-6 text-emerald-400">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-6 text-red-400">Quick Links</h3>
             <ul className="space-y-3">
               {['About Us', 'Our Mission', 'Leadership', 'Events', 'Get Involved', 'Volunteer'].map((link) => (
                 <li key={link}>
-                  <a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors flex items-center gap-2">
+                  <a href="#" className="text-gray-300 hover:text-red-400 transition-colors flex items-center gap-2">
                     <ExternalLink className="w-3 h-3" />
                     {link}
                   </a>
@@ -48,11 +48,11 @@ export default function Footer() {
 
           {/* Resources */}
           <div>
-            <h3 className="text-lg font-semibold mb-6 text-emerald-400">Resources</h3>
+            <h3 className="text-lg font-semibold mb-6 text-blue-400">Resources</h3>
             <ul className="space-y-3">
               {['Policy Papers', 'Research Reports', 'Media Kit', 'FAQ', 'Contact Support', 'Privacy Policy'].map((link) => (
                 <li key={link}>
-                  <a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors flex items-center gap-2">
+                  <a href="#" className="text-gray-300 hover:text-red-400 transition-colors flex items-center gap-2">
                     <ExternalLink className="w-3 h-3" />
                     {link}
                   </a>
@@ -63,23 +63,23 @@ export default function Footer() {
 
           {/* Contact Info */}
           <div>
-            <h3 className="text-lg font-semibold mb-6 text-emerald-400">Contact Us</h3>
+            <h3 className="text-lg font-semibold mb-6 text-blue-400">Contact Us</h3>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-emerald-400 mt-0.5 flex-shrink-0" />
+                <MapPin className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="text-gray-300">UFA Headquarters</p>
                   <p className="text-gray-400 text-sm">Nairobi, Kenya</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Phone className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                <Phone className="w-5 h-5 text-blue-400 flex-shrink-0" />
                 <div>
                   <p className="text-gray-300">+254 xxx xxx xxx</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                <Mail className="w-5 h-5 text-blue-400 flex-shrink-0" />
                 <div>
                   <p className="text-gray-300">info@ufakenya.org</p>
                 </div>

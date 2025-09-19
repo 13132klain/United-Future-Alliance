@@ -167,7 +167,7 @@ export default function DonationPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-emerald-600 via-green-600 to-teal-700 text-white py-20">
+      <section className="bg-gradient-to-br from-green-600 via-blue-600 to-red-700 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="flex justify-center mb-6">
@@ -178,7 +178,7 @@ export default function DonationPage() {
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
               Support Our Mission
             </h1>
-            <p className="text-xl md:text-2xl text-emerald-100 mb-8 max-w-3xl mx-auto">
+            <p className="text-xl md:text-2xl text-green-100 mb-8 max-w-3xl mx-auto">
               Join us in building a better Kenya. Your donation helps us create lasting change in education, healthcare, infrastructure, and community development.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

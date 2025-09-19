@@ -1,4 +1,4 @@
-import { Event, NewsItem, Leader, Resource, Donation, DonationCampaign } from '../types';
+import { Event, NewsItem, Leader, Resource, Donation, DonationCampaign, Membership } from '../types';
 
 // Subscriber arrays for real-time updates
 let eventSubscribers: ((events: Event[]) => void)[] = [];
@@ -7,6 +7,7 @@ let leaderSubscribers: ((leaders: Leader[]) => void)[] = [];
 let resourceSubscribers: ((resources: Resource[]) => void)[] = [];
 let donationSubscribers: ((donations: Donation[]) => void)[] = [];
 let campaignSubscribers: ((campaigns: DonationCampaign[]) => void)[] = [];
+let membershipSubscribers: ((memberships: Membership[]) => void)[] = [];
 
 // Mock data
 let mockEvents: Event[] = [
@@ -201,6 +202,52 @@ let mockCampaigns: DonationCampaign[] = [
     image: 'https://images.pexels.com/photos/6646877/pexels-photo-6646877.jpeg?auto=compress&cs=tinysrgb&w=800',
     category: 'emergency',
     featured: false
+  }
+];
+
+let mockMemberships: Membership[] = [
+  {
+    id: '1',
+    firstName: 'John',
+    lastName: 'Mwangi',
+    email: 'john.mwangi@email.com',
+    phone: '+254712345678',
+    dateOfBirth: new Date('1990-05-15'),
+    gender: 'male',
+    county: 'Nairobi',
+    constituency: 'Westlands',
+    ward: 'Parklands',
+    occupation: 'Software Engineer',
+    organization: 'Tech Solutions Ltd',
+    interests: ['Technology', 'Education', 'Youth Development'],
+    motivation: 'I want to contribute to Kenya\'s digital transformation and help bridge the technology gap in rural areas.',
+    howDidYouHear: 'Social Media',
+    isVolunteer: true,
+    volunteerAreas: ['Technology Training', 'Event Organization'],
+    status: 'approved',
+    submittedAt: new Date('2024-01-10'),
+    reviewedAt: new Date('2024-01-12'),
+    reviewedBy: 'Dr. Sarah Mwangi'
+  },
+  {
+    id: '2',
+    firstName: 'Mary',
+    lastName: 'Wanjiku',
+    email: 'mary.wanjiku@email.com',
+    phone: '+254723456789',
+    dateOfBirth: new Date('1985-08-22'),
+    gender: 'female',
+    county: 'Kiambu',
+    constituency: 'Thika Town',
+    occupation: 'Teacher',
+    organization: 'Thika Primary School',
+    interests: ['Education', 'Women Empowerment', 'Community Development'],
+    motivation: 'As an educator, I believe in the power of quality education to transform communities and want to be part of UFA\'s education initiatives.',
+    howDidYouHear: 'Friend Recommendation',
+    isVolunteer: true,
+    volunteerAreas: ['Education Programs', 'Community Outreach'],
+    status: 'pending',
+    submittedAt: new Date('2024-02-01')
   }
 ];
 
@@ -649,6 +696,66 @@ export const campaignsService = {
       const index = campaignSubscribers.indexOf(callback);
       if (index > -1) {
         campaignSubscribers.splice(index, 1);
+      }
+    };
+  }
+};
+
+// Membership Service
+export const membershipService = {
+  async getMemberships(): Promise<Membership[]> {
+    console.log('Using mock memberships data');
+    return [...mockMemberships];
+  },
+
+  async addMembership(membership: Omit<Membership, 'id'>): Promise<string> {
+    console.log('Adding mock membership:', membership);
+    const newId = Date.now().toString();
+    const newMembership: Membership = {
+      id: newId,
+      ...membership
+    };
+    mockMemberships.unshift(newMembership);
+    
+    // Notify all subscribers
+    membershipSubscribers.forEach(callback => callback([...mockMemberships]));
+    
+    return newId;
+  },
+
+  async updateMembership(id: string, membership: Partial<Membership>): Promise<void> {
+    console.log('Updating mock membership:', id, membership);
+    const index = mockMemberships.findIndex(m => m.id === id);
+    if (index !== -1) {
+      mockMemberships[index] = { ...mockMemberships[index], ...membership };
+      
+      // Notify all subscribers
+      membershipSubscribers.forEach(callback => callback([...mockMemberships]));
+    }
+  },
+
+  async deleteMembership(id: string): Promise<void> {
+    console.log('Deleting mock membership:', id);
+    mockMemberships = mockMemberships.filter(m => m.id !== id);
+    
+    // Notify all subscribers
+    membershipSubscribers.forEach(callback => callback([...mockMemberships]));
+  },
+
+  subscribeToMemberships(callback: (memberships: Membership[]) => void): () => void {
+    console.log('Setting up mock memberships subscription');
+    // Simulate real-time updates by calling callback immediately
+    callback([...mockMemberships]);
+    
+    // Store callback for future updates
+    membershipSubscribers.push(callback);
+    
+    // Return unsubscribe function
+    return () => {
+      console.log('Unsubscribing from mock memberships');
+      const index = membershipSubscribers.indexOf(callback);
+      if (index > -1) {
+        membershipSubscribers.splice(index, 1);
       }
     };
   }

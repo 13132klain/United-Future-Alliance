@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, MapPin, Clock, Users, Video, ExternalLink, X, Mail, Phone } from 'lucide-react';
 import { Event } from '../types';
-import { eventsService } from '../lib/mockFirestoreService';
+import { eventsService } from '../lib/firestoreServices';
 
 export default function EventsPage() {
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
@@ -130,8 +130,8 @@ export default function EventsPage() {
               onClick={() => setSelectedFilter(filter.id)}
               className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
                 selectedFilter === filter.id
-                  ? 'bg-emerald-500 text-white shadow-md'
-                  : 'bg-white text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 shadow-sm'
+                  ? 'bg-red-500 text-white shadow-md'
+                  : 'bg-white text-gray-700 hover:bg-red-50 hover:text-red-600 shadow-sm'
               }`}
             >
               {filter.label}
@@ -142,7 +142,7 @@ export default function EventsPage() {
         {/* Events Grid */}
         {loading ? (
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
             <p className="mt-4 text-gray-600">Loading events...</p>
           </div>
         ) : (
@@ -152,7 +152,7 @@ export default function EventsPage() {
             return (
               <div key={event.id} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
                 {/* Event Image */}
-                <div className="h-48 bg-gradient-to-br from-emerald-400 to-green-500 relative overflow-hidden">
+                <div className="h-48 bg-gradient-to-br from-red-400 to-blue-500 relative overflow-hidden">
                   <img 
                     src={event.image} 
                     alt={event.title}
@@ -185,7 +185,7 @@ export default function EventsPage() {
                   {/* Event Details */}
                   <div className="space-y-3 mb-6">
                     <div className="flex items-center gap-3 text-sm text-gray-600">
-                      <Calendar className="w-4 h-4 text-emerald-500" />
+                      <Calendar className="w-4 h-4 text-red-500" />
                       <span>
                         {event.date.toLocaleDateString('en-US', { 
                           weekday: 'long',
@@ -196,11 +196,11 @@ export default function EventsPage() {
                       </span>
                     </div>
                     <div className="flex items-center gap-3 text-sm text-gray-600">
-                      <MapPin className="w-4 h-4 text-emerald-500" />
+                      <MapPin className="w-4 h-4 text-blue-500" />
                       <span>{event.location}</span>
                     </div>
                     <div className="flex items-center gap-3 text-sm text-gray-600">
-                      <EventIcon className="w-4 h-4 text-emerald-500" />
+                      <EventIcon className="w-4 h-4 text-green-500" />
                       <span className="capitalize">{event.type}</span>
                     </div>
                   </div>
@@ -208,7 +208,7 @@ export default function EventsPage() {
                   {/* Action Button */}
                   <button 
                     onClick={() => openEventModal(event)}
-                    className="w-full bg-emerald-500 text-white py-3 rounded-lg font-semibold hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2"
+                    className="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
                   >
                     {event.registrationRequired ? 'Register Now' : 'Learn More'}
                     <ExternalLink className="w-4 h-4" />
@@ -222,7 +222,7 @@ export default function EventsPage() {
 
         {/* Call to Action */}
         <div className="text-center mt-16">
-          <div className="bg-gradient-to-br from-emerald-50 to-green-50 p-8 rounded-2xl border border-emerald-100">
+          <div className="bg-gradient-to-br from-red-50 to-blue-50 p-8 rounded-2xl border border-red-100">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               Can't Find What You're Looking For?
             </h2>
@@ -231,10 +231,10 @@ export default function EventsPage() {
               to be the first to know about upcoming opportunities in your area.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-emerald-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-emerald-600 transition-colors">
+              <button className="bg-red-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors">
                 Subscribe to Updates
               </button>
-              <button className="border-2 border-emerald-500 text-emerald-600 px-8 py-3 rounded-lg font-semibold hover:bg-emerald-50 transition-colors">
+              <button className="border-2 border-blue-500 text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
                 Contact Us
               </button>
             </div>

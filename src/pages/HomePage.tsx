@@ -1,7 +1,7 @@
 import { ArrowRight, Users, Target, Shield, Lightbulb, Calendar, BookOpen, TrendingUp, X, MapPin, Clock, Mail, Phone, ExternalLink } from 'lucide-react';
 import { NavigationPage, NewsItem, Event } from '../types';
 import { useState, useEffect } from 'react';
-import { newsService, eventsService } from '../lib/mockFirestoreService';
+import { newsService, eventsService } from '../lib/firestoreServices';
 
 interface HomePageProps {
   onNavigate: (page: NavigationPage) => void;
@@ -59,7 +59,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
       case 'rally': return 'bg-red-100 text-red-800';
       case 'webinar': return 'bg-blue-100 text-blue-800';
       case 'meeting': return 'bg-green-100 text-green-800';
-      case 'fundraiser': return 'bg-purple-100 text-purple-800';
+      case 'fundraiser': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -92,12 +92,12 @@ export default function HomePage({ onNavigate }: HomePageProps) {
       {/* Hero Section */}
       <section className="relative bg-white text-gray-900 overflow-hidden min-h-screen flex items-center">
         {/* Animated Background Elements */}
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 via-white to-green-50/30"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 via-white to-blue-50/30"></div>
         
         {/* Floating geometric shapes - hidden on mobile */}
-        <div className="absolute top-20 left-10 w-20 h-20 bg-emerald-200/30 rounded-full animate-bounce delay-1000 hidden md:block"></div>
-        <div className="absolute top-40 right-20 w-16 h-16 bg-yellow-200/40 rounded-lg rotate-45 animate-pulse delay-500 hidden md:block"></div>
-        <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-emerald-300/40 rounded-full animate-ping delay-700 hidden md:block"></div>
+        <div className="absolute top-20 left-10 w-20 h-20 bg-green-200/30 rounded-full animate-bounce delay-1000 hidden md:block"></div>
+        <div className="absolute top-40 right-20 w-16 h-16 bg-blue-200/40 rounded-lg rotate-45 animate-pulse delay-500 hidden md:block"></div>
+        <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-red-200/40 rounded-full animate-ping delay-700 hidden md:block"></div>
         <div className="absolute top-1/2 right-10 w-8 h-8 bg-green-200/50 rounded-full animate-bounce delay-300 hidden md:block"></div>
         
         {/* Main content */}
@@ -106,8 +106,8 @@ export default function HomePage({ onNavigate }: HomePageProps) {
             {/* Left Content */}
             <div className="space-y-6 sm:space-y-8 animate-fade-in-up text-center lg:text-left">
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 bg-emerald-100 backdrop-blur-sm border border-emerald-200 rounded-full px-3 sm:px-4 py-2 text-emerald-700 text-xs sm:text-sm font-medium">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+              <div className="inline-flex items-center gap-2 bg-green-100 backdrop-blur-sm border border-green-200 rounded-full px-3 sm:px-4 py-2 text-green-700 text-xs sm:text-sm font-medium">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 <span className="hidden sm:inline">Join 25,000+ Kenyans Making a Difference</span>
                 <span className="sm:hidden">25,000+ Members</span>
               </div>
@@ -115,7 +115,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               {/* Main Heading */}
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
                 <span className="block animate-slide-in-left text-gray-900">Building Kenya's</span>
-                <span className="block text-emerald-600 animate-slide-in-right delay-300 bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">
+                <span className="block text-green-600 animate-slide-in-right delay-300 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
                   Unified Future
                 </span>
               </h1>
@@ -129,15 +129,15 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 animate-fade-in-up delay-700 max-w-md mx-auto lg:mx-0">
                 <button
-                  onClick={() => onNavigate('home')}
-                  className="group bg-emerald-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold hover:bg-emerald-700 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-2xl hover:scale-105 transform text-sm sm:text-base"
+                  onClick={() => onNavigate('membership')}
+                  className="group bg-blue-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold hover:bg-blue-700 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-2xl hover:scale-105 transform text-sm sm:text-base"
                 >
                   <span>Join the Movement</span>
                   <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
                 <button
                   onClick={() => onNavigate('about')}
-                  className="group border-2 border-emerald-600 text-emerald-600 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold hover:bg-emerald-600 hover:text-white transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 transform text-sm sm:text-base"
+                  className="group border-2 border-red-600 text-red-600 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold hover:bg-red-600 hover:text-white transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 transform text-sm sm:text-base"
                 >
                   <span>Learn More</span>
                   <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
@@ -147,15 +147,15 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               {/* Trust Indicators */}
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 text-xs sm:text-sm text-gray-500 animate-fade-in-up delay-1000">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
                   <span>47 Counties</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   <span>15,000+ Youth</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                   <span>12 Initiatives</span>
                 </div>
               </div>
@@ -174,7 +174,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                         alt="Growth and Development"
                         className="w-full h-full object-cover card-image grayscale"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/80 via-emerald-600/20 to-transparent"></div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-green-900/80 via-green-600/20 to-transparent"></div>
                       <div className="absolute bottom-2 left-2 right-2 text-center text-white">
                         <div className="text-xs sm:text-xs sm:text-xs font-bold">Growth</div>
                       </div>
@@ -263,14 +263,14 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                   </div>
                   
                   {/* Center Kenya Flag */}
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-white rounded-full shadow-2xl flex items-center justify-center border-2 sm:border-4 border-emerald-200 z-10">
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-white rounded-full shadow-2xl flex items-center justify-center border-2 sm:border-4 border-green-200 z-10">
                     <div className="text-2xl sm:text-3xl md:text-4xl font-bold">🇰🇪</div>
                   </div>
                 </div>
                 
                 {/* Connecting lines (optional) */}
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 border border-emerald-200/30 rounded-full animate-spin-slow"></div>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 border border-emerald-300/20 rounded-full animate-spin-reverse"></div>
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 border border-green-200/30 rounded-full animate-spin-slow"></div>
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 border border-blue-300/20 rounded-full animate-spin-reverse"></div>
               </div>
             </div>
           </div>
@@ -278,8 +278,8 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         
         {/* Scroll indicator */}
         <div className="absolute bottom-4 sm:bottom-6 md:bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <div className="w-5 h-8 sm:w-6 sm:h-10 border-2 border-emerald-300 rounded-full flex justify-center">
-            <div className="w-1 h-2 sm:h-3 bg-emerald-500 rounded-full mt-1 sm:mt-2 animate-pulse"></div>
+          <div className="w-5 h-8 sm:w-6 sm:h-10 border-2 border-green-300 rounded-full flex justify-center">
+            <div className="w-1 h-2 sm:h-3 bg-green-500 rounded-full mt-1 sm:mt-2 animate-pulse"></div>
           </div>
         </div>
       </section>
@@ -295,8 +295,18 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               { label: 'Policy Initiatives', value: '12', icon: BookOpen }
             ].map((stat, index) => (
               <div key={index} className="text-center p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-full mb-4">
-                  <stat.icon className="w-8 h-8 text-emerald-600" />
+                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${
+                  index === 0 ? 'bg-red-100' : 
+                  index === 1 ? 'bg-green-100' : 
+                  index === 2 ? 'bg-blue-100' : 
+                  'bg-red-100'
+                }`}>
+                  <stat.icon className={`w-8 h-8 ${
+                    index === 0 ? 'text-red-600' : 
+                    index === 1 ? 'text-green-600' : 
+                    index === 2 ? 'text-blue-600' : 
+                    'text-red-600'
+                  }`} />
                 </div>
                 <p className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</p>
                 <p className="text-gray-600">{stat.label}</p>
@@ -322,7 +332,12 @@ export default function HomePage({ onNavigate }: HomePageProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {coreValues.map((value, index) => (
               <div key={index} className="text-center p-8 rounded-xl hover:shadow-lg transition-shadow">
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full mb-6 shadow-lg">
+                <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full mb-6 shadow-lg ${
+                  index === 0 ? 'bg-gradient-to-br from-red-500 to-red-600' : 
+                  index === 1 ? 'bg-gradient-to-br from-blue-500 to-blue-600' : 
+                  index === 2 ? 'bg-gradient-to-br from-green-500 to-green-600' : 
+                  'bg-gradient-to-br from-red-500 to-red-600'
+                }`}>
                   <value.icon className="w-10 h-10 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">{value.title}</h3>
@@ -334,7 +349,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
       </section>
 
       {/* Our Vision */}
-      <section className="py-20 bg-gradient-to-br from-emerald-50 via-white to-green-50">
+      <section className="py-20 bg-gradient-to-br from-green-50 via-white to-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
@@ -351,7 +366,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
             <div className="space-y-8">
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
+                  <div className="flex-shrink-0 w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
                     <div className="text-2xl">🎯</div>
                   </div>
                   <div>
@@ -377,7 +392,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                  <div className="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
                     <div className="text-2xl">🌱</div>
                   </div>
                   <div>
@@ -403,23 +418,23 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                 </div>
               </div>
 
-              <div className="bg-white p-6 rounded-xl shadow-lg border border-emerald-100">
+              <div className="bg-white p-6 rounded-xl shadow-lg border border-green-100">
                 <h4 className="text-lg font-semibold text-gray-900 mb-3">By 2030, We See:</h4>
                 <ul className="space-y-2 text-gray-600">
                   <li className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                     <span>100% access to quality education and healthcare</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                     <span>Renewable energy powering 80% of our nation</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
                     <span>Digital infrastructure connecting every community</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                     <span>Transparent governance with citizen participation</span>
                   </li>
                 </ul>
@@ -759,7 +774,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
       </section>
 
       {/* Call to Action */}
-      <section className="py-20 bg-gradient-to-br from-emerald-600 to-green-700 text-white">
+      <section className="py-20 bg-gradient-to-br from-red-600 to-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold mb-6">
             Ready to Shape Kenya's Future?
@@ -770,14 +785,14 @@ export default function HomePage({ onNavigate }: HomePageProps) {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
-              onClick={() => onNavigate('home')}
+              onClick={() => onNavigate('membership')}
               className="bg-yellow-400 text-gray-900 px-8 py-4 rounded-lg font-semibold hover:bg-yellow-300 transition-colors shadow-lg"
             >
               Become a Member
             </button>
             <button
               onClick={() => onNavigate('donate')}
-              className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-emerald-700 transition-colors"
+              className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-red-700 transition-colors"
             >
               Support the Cause
             </button>
@@ -791,7 +806,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
           <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="relative">
-              <div className="h-48 bg-gradient-to-br from-emerald-400 to-green-500 relative overflow-hidden">
+              <div className="h-48 bg-gradient-to-br from-green-400 to-blue-500 relative overflow-hidden">
                 <img 
                   src={selectedEvent.image} 
                   alt={selectedEvent.title}
@@ -818,7 +833,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               <div className="space-y-4 mb-6">
                 {/* Event Details */}
                 <div className="flex items-center gap-3 text-gray-600">
-                  <Calendar className="w-5 h-5 text-emerald-500" />
+                  <Calendar className="w-5 h-5 text-green-500" />
                   <span className="font-medium">
                     {selectedEvent.date.toLocaleDateString('en-US', {
                       weekday: 'long',
@@ -830,7 +845,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                 </div>
 
                 <div className="flex items-center gap-3 text-gray-600">
-                  <Clock className="w-5 h-5 text-emerald-500" />
+                  <Clock className="w-5 h-5 text-blue-500" />
                   <span className="font-medium">
                     {selectedEvent.date.toLocaleTimeString('en-US', {
                       hour: '2-digit',
@@ -840,14 +855,14 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                 </div>
 
                 <div className="flex items-center gap-3 text-gray-600">
-                  <MapPin className="w-5 h-5 text-emerald-500" />
+                  <MapPin className="w-5 h-5 text-red-500" />
                   <span className="font-medium">{selectedEvent.location}</span>
                 </div>
 
                 <div className="flex items-center gap-3 text-gray-600">
                   {(() => {
                     const EventIcon = getEventIcon(selectedEvent.type);
-                    return <EventIcon className="w-5 h-5 text-emerald-500" />;
+                    return <EventIcon className="w-5 h-5 text-green-500" />;
                   })()}
                   <span className="font-medium capitalize">{selectedEvent.type}</span>
                 </div>
@@ -861,9 +876,9 @@ export default function HomePage({ onNavigate }: HomePageProps) {
 
               {/* Registration Info */}
               {selectedEvent.registrationRequired && (
-                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-6">
-                  <h3 className="text-lg font-semibold text-emerald-800 mb-2">Registration Required</h3>
-                  <p className="text-emerald-700 text-sm">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                  <h3 className="text-lg font-semibold text-green-800 mb-2">Registration Required</h3>
+                  <p className="text-green-700 text-sm">
                     This event requires prior registration. Please register to secure your spot.
                   </p>
                 </div>
@@ -874,11 +889,11 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">Need More Information?</h3>
                 <div className="space-y-2">
                   <div className="flex items-center gap-3 text-gray-600">
-                    <Mail className="w-4 h-4 text-emerald-500" />
+                    <Mail className="w-4 h-4 text-blue-500" />
                     <span>events@ufa.org</span>
                   </div>
                   <div className="flex items-center gap-3 text-gray-600">
-                    <Phone className="w-4 h-4 text-emerald-500" />
+                    <Phone className="w-4 h-4 text-red-500" />
                     <span>+254 700 000 000</span>
                   </div>
                 </div>
@@ -887,12 +902,12 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3">
                 {selectedEvent.registrationRequired ? (
-                  <button className="flex-1 bg-emerald-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2">
+                  <button className="flex-1 bg-green-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-600 transition-colors flex items-center justify-center gap-2">
                     Register Now
                     <ExternalLink className="w-4 h-4" />
                   </button>
                 ) : (
-                  <button className="flex-1 bg-emerald-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2">
+                  <button className="flex-1 bg-blue-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-600 transition-colors flex items-center justify-center gap-2">
                     Get Directions
                     <MapPin className="w-4 h-4" />
                   </button>

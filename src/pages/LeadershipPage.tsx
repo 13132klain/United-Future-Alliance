@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ExternalLink, Twitter, Linkedin, Facebook } from 'lucide-react';
 import { Leader } from '../types';
-import { leadersService } from '../lib/mockFirestoreService';
+import { leadersService } from '../lib/firestoreServices';
 
 export default function LeadershipPage() {
   const [leaders, setLeaders] = useState<Leader[]>([]);
@@ -128,7 +128,7 @@ export default function LeadershipPage() {
                 <h3 className="text-xl font-bold text-gray-900 mb-2">
                   {leader.name}
                 </h3>
-                <p className="text-emerald-600 font-semibold mb-4">
+                <p className="text-red-600 font-semibold mb-4">
                   {leader.position}
                 </p>
                 <p className="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-4">
@@ -143,7 +143,7 @@ export default function LeadershipPage() {
                       <a
                         key={platform}
                         href={url}
-                        className="w-8 h-8 bg-gray-100 hover:bg-emerald-500 rounded-full flex items-center justify-center text-gray-600 hover:text-white transition-all duration-200"
+                        className="w-8 h-8 bg-gray-100 hover:bg-blue-500 rounded-full flex items-center justify-center text-gray-600 hover:text-white transition-all duration-200"
                         aria-label={`${leader.name} on ${platform}`}
                       >
                         <SocialIcon className="w-4 h-4" />
@@ -157,7 +157,7 @@ export default function LeadershipPage() {
         </div>
 
         {/* Advisory Board Section */}
-        <section className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-8 mb-16 border border-emerald-100">
+        <section className="bg-gradient-to-br from-blue-50 to-green-50 rounded-2xl p-8 mb-16 border border-blue-100">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
               Advisory Board
@@ -203,7 +203,7 @@ export default function LeadershipPage() {
             ].map((advisor, index) => (
               <div key={index} className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
                 <h4 className="font-semibold text-gray-900 mb-1">{advisor.name}</h4>
-                <p className="text-emerald-600 text-sm mb-2">{advisor.title}</p>
+                <p className="text-green-600 text-sm mb-2">{advisor.title}</p>
                 <p className="text-gray-600 text-xs">{advisor.expertise}</p>
               </div>
             ))}
@@ -212,11 +212,11 @@ export default function LeadershipPage() {
 
         {/* Join Leadership CTA */}
         <div className="text-center">
-          <div className="bg-gradient-to-br from-emerald-600 to-green-700 text-white p-12 rounded-2xl">
+          <div className="bg-gradient-to-br from-red-600 to-blue-700 text-white p-12 rounded-2xl">
             <h2 className="text-3xl font-bold mb-4">
               Ready to Lead with Us?
             </h2>
-            <p className="text-xl mb-8 text-emerald-100 max-w-2xl mx-auto">
+            <p className="text-xl mb-8 text-red-100 max-w-2xl mx-auto">
               UFA is always looking for passionate leaders to join our team at various levels. 
               If you share our vision for Kenya's future, we want to hear from you.
             </p>
@@ -224,7 +224,7 @@ export default function LeadershipPage() {
               <button className="bg-yellow-400 text-gray-900 px-8 py-4 rounded-lg font-semibold hover:bg-yellow-300 transition-colors shadow-lg">
                 Apply for Leadership
               </button>
-              <button className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-emerald-700 transition-colors">
+              <button className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-red-700 transition-colors">
                 Volunteer with Us
               </button>
             </div>

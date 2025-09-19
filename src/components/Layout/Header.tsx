@@ -63,11 +63,11 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
           <div className="flex items-center">
             <button
               onClick={() => handleNavigation('home')}
-              className="flex items-center space-x-2 text-2xl font-bold text-emerald-600 hover:text-emerald-700 transition-colors"
+              className="flex items-center space-x-2 text-2xl font-bold text-red-600 hover:text-red-700 transition-colors"
             >
-              <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">UFA</span>
-              </div>
+            </div>
               <span>UFA</span>
             </button>
           </div>
@@ -80,36 +80,36 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
                 const isActive = currentPage === item.id;
                 
                 return (
-                  <button
-                    key={item.id}
+              <button
+                key={item.id}
                     onClick={() => handleNavigation(item.id as NavigationPage)}
                     className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                       isActive
-                        ? 'text-emerald-600 bg-emerald-50'
-                        : 'text-gray-700 hover:text-emerald-600 hover:bg-gray-50'
+                        ? 'text-red-600 bg-red-50'
+                        : 'text-gray-700 hover:text-red-600 hover:bg-gray-50'
                     }`}
                   >
                     {Icon && <Icon className="w-4 h-4" />}
                     <span>{item.label}</span>
-                  </button>
+              </button>
                 );
               })}
-            </nav>
+          </nav>
 
             {/* Auth Section */}
             <div className="flex items-center space-x-4">
-              {user ? (
+            {user ? (
                 <div className="relative user-menu-container">
                   {/* User Menu Button */}
                   <button
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                     className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-full overflow-hidden bg-emerald-100 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-blue-100 flex items-center justify-center">
                       {user.avatar ? (
                         <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
                       ) : (
-                        <User className="w-4 h-4 text-emerald-600" />
+                        <User className="w-4 h-4 text-blue-600" />
                       )}
                     </div>
                     <span className="hidden sm:block text-sm font-medium text-gray-700">{user.name}</span>
@@ -124,42 +124,42 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
                       </div>
                       
                       {user.role === 'admin' && (
-                        <button
+                <button
                           onClick={() => handleNavigation('admin')}
                           className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                        >
+                >
                           <Settings className="w-4 h-4" />
                           Admin Dashboard
-                        </button>
+                </button>
                       )}
                       
-                      <button
+                <button
                         onClick={handleLogout}
                         className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                      >
+                >
                         <LogOut className="w-4 h-4" />
                         Sign Out
-                      </button>
+                </button>
                     </div>
                   )}
-                </div>
-              ) : (
+              </div>
+            ) : (
                 <div className="flex items-center space-x-2">
-                  <button
+                <button
                     onClick={() => handleNavigation('login')}
-                    className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-50 rounded-lg transition-colors"
-                  >
-                    <LogIn className="w-4 h-4" />
+                    className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-colors"
+                >
+                  <LogIn className="w-4 h-4" />
                     <span>Sign In</span>
-                  </button>
-                  <button
+                </button>
+                <button
                     onClick={() => handleNavigation('register')}
-                    className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
-                  >
+                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                >
                     Sign Up
-                  </button>
-                </div>
-              )}
+                </button>
+              </div>
+            )}
             </div>
           </div>
 
@@ -167,7 +167,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-md text-gray-700 hover:text-emerald-600 hover:bg-gray-50 transition-colors"
+              className="p-2 rounded-md text-gray-700 hover:text-red-600 hover:bg-gray-50 transition-colors"
             >
               {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -183,13 +183,13 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
                 const isActive = currentPage === item.id;
                 
                 return (
-                  <button
-                    key={item.id}
+                <button
+                  key={item.id}
                     onClick={() => handleNavigation(item.id as NavigationPage)}
                     className={`flex items-center space-x-2 w-full px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                       isActive
-                        ? 'text-emerald-600 bg-emerald-50'
-                        : 'text-gray-700 hover:text-emerald-600 hover:bg-gray-50'
+                        ? 'text-red-600 bg-red-50'
+                        : 'text-gray-700 hover:text-red-600 hover:bg-gray-50'
                     }`}
                   >
                     {Icon && <Icon className="w-4 h-4" />}
@@ -248,7 +248,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
                       className="w-full px-3 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
                     >
                       Sign Up
-                    </button>
+                </button>
                   </div>
                 )}
               </div>

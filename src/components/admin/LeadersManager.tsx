@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Leader } from '../../types';
-import { leadersService } from '../../lib/mockFirestoreService';
+import { leadersService } from '../../lib/firestoreServices';
 import { 
   Plus, 
   Search, 

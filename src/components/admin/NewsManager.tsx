@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NewsItem } from '../../types';
-import { newsService } from '../../lib/mockFirestoreService';
+import { newsService } from '../../lib/firestoreServices';
 import { 
   Plus, 
   Search, 

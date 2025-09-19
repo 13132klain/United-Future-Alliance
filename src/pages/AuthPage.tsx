@@ -111,13 +111,13 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         {/* Back to Home Button */}
         <div className="text-center">
           <button
             onClick={() => onNavigate('home')}
-            className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition-colors mb-4"
+            className="inline-flex items-center gap-2 text-red-600 hover:text-red-700 transition-colors mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Home
@@ -128,8 +128,8 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
         {/* Header */}
         <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">UFA</span>
               </div>
           </div>
@@ -183,7 +183,7 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
                     type="text"
                     autoComplete="name"
                     required
-                    className="appearance-none rounded-lg relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                    className="appearance-none rounded-lg relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     placeholder="Enter your full name"
                     value={formData.name}
                     onChange={handleChange}
@@ -207,7 +207,7 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
                   type="email"
                   autoComplete="email"
                   required
-                  className="appearance-none rounded-lg relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                  className="appearance-none rounded-lg relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   placeholder="Enter your email"
                   value={formData.email}
                   onChange={handleChange}
@@ -230,7 +230,7 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
                   type={showPassword ? 'text' : 'password'}
                   autoComplete={isLogin ? 'current-password' : 'new-password'}
                   required
-                  className="appearance-none rounded-lg relative block w-full pl-10 pr-10 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                  className="appearance-none rounded-lg relative block w-full pl-10 pr-10 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   placeholder="Enter your password"
                   value={formData.password}
                   onChange={handleChange}
@@ -275,7 +275,7 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
                     type={showConfirmPassword ? 'text' : 'password'}
                     autoComplete="new-password"
                     required
-                    className="appearance-none rounded-lg relative block w-full pl-10 pr-10 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                    className="appearance-none rounded-lg relative block w-full pl-10 pr-10 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     placeholder="Confirm your password"
                     value={formData.confirmPassword}
                     onChange={handleChange}
@@ -297,7 +297,7 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
             <button
               type="submit"
               disabled={isSubmitting || loading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             >
               {isSubmitting || loading ? (
                 <>
@@ -324,7 +324,7 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
           <button
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="w-full flex justify-center items-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            className="w-full flex justify-center items-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
               <path
@@ -354,7 +354,7 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
               <button
                 type="button"
                 onClick={switchMode}
-                className="font-medium text-emerald-600 hover:text-emerald-500 transition-colors"
+                className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
               >
                 {isLogin ? 'Sign up' : 'Sign in'}
               </button>
@@ -373,8 +373,8 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
             <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Lock className="w-8 h-8 text-emerald-600" />
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Lock className="w-8 h-8 text-red-600" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-2">Reset Password</h3>
               <p className="text-gray-600">
@@ -409,7 +409,7 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
                       id="resetEmail"
                       type="email"
                       required
-                      className="appearance-none rounded-lg relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                      className="appearance-none rounded-lg relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                       placeholder="Enter your email"
                       value={resetEmail}
                       onChange={(e) => setResetEmail(e.target.value)}
