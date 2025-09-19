@@ -7,6 +7,7 @@ import LeadershipPage from './pages/LeadershipPage';
 import ResourcesPage from './pages/ResourcesPage';
 import DonationPage from './pages/DonationPage';
 import MembershipPage from './pages/MembershipPage';
+import CommunityPage from './pages/CommunityPage';
 import AuthPage from './pages/AuthPage';
 import AdminDashboard from './pages/AdminDashboard';
 import { AuthProvider } from './contexts/AuthContext';
@@ -59,23 +60,7 @@ function App() {
           </div>
         );
       case 'community':
-        return (
-          <div className="min-h-screen bg-gray-50 py-12">
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center mb-12">
-                <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">Community Hub</h1>
-                <p className="text-xl text-gray-600">Connect, discuss, and collaborate with fellow UFA members.</p>
-              </div>
-              <div className="bg-white rounded-xl shadow-lg p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Coming Soon</h2>
-                <p className="text-gray-600 leading-relaxed">
-                  Our community platform is currently under development. Soon you'll be able to participate in 
-                  discussions, join advocacy campaigns, and collaborate with other members on important issues.
-                </p>
-              </div>
-            </div>
-          </div>
-        );
+        return <CommunityPage onNavigate={setCurrentPage} />;
       default:
         return <HomePage onNavigate={setCurrentPage} />;
     }

@@ -12,6 +12,7 @@ import VoterGuideManager from '../components/admin/VoterGuideManager';
 import ActionToolkitManager from '../components/admin/ActionToolkitManager';
 import DigitalGuideManager from '../components/admin/DigitalGuideManager';
 import ResearchManager from '../components/admin/ResearchManager';
+import CommunityManager from '../components/admin/CommunityManager';
 import SettingsManager from '../components/admin/SettingsManager';
 import FirebaseStatus from '../components/FirebaseStatus';
 import { eventsService, newsService, leadersService } from '../lib/firestoreServices';
@@ -43,7 +44,7 @@ interface AdminDashboardProps {
   onNavigate: (page: NavigationPage) => void;
 }
 
-type DashboardTab = 'overview' | 'events' | 'news' | 'leaders' | 'resources' | 'donations' | 'memberships' | 'constitution' | 'voter-guide' | 'action-toolkit' | 'digital-guide' | 'research' | 'settings';
+type DashboardTab = 'overview' | 'events' | 'news' | 'leaders' | 'resources' | 'donations' | 'memberships' | 'constitution' | 'voter-guide' | 'action-toolkit' | 'digital-guide' | 'research' | 'community' | 'settings';
 
 export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
   const { user } = useAuth();
@@ -163,6 +164,7 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
     { id: 'action-toolkit', label: 'Action Toolkit', icon: FileText },
     { id: 'digital-guide', label: 'Digital Guide', icon: Shield },
     { id: 'research', label: 'Research', icon: BookOpen },
+    { id: 'community', label: 'Community', icon: Users },
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
@@ -376,6 +378,8 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
             return <DigitalGuideManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
           case 'research':
             return <ResearchManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
+          case 'community':
+            return <CommunityManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
           case 'settings':
             return (
               <div className="space-y-6">
