@@ -40,7 +40,7 @@ interface AuthProviderProps {
 }
 
 // Admin emails that get admin role
-const ADMIN_EMAILS = ['admin@ufa.org', 'yemblocreations@gmail.com'];
+const ADMIN_EMAILS = ['admin@ufa.org', 'omondikeyvin@gmail.com'];
 
 // Helper function to convert Firebase user to our User type
 const convertFirebaseUser = async (firebaseUser: FirebaseUser): Promise<User> => {
