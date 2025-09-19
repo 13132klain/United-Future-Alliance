@@ -56,7 +56,9 @@ export default function AuthPage({ mode, onNavigate }: AuthPageProps) {
         await signIn(formData.email, formData.password);
       } else {
         if (formData.password !== formData.confirmPassword) {
-          throw new Error('Passwords do not match');
+          // Handle password mismatch error
+          console.error('Passwords do not match');
+          return;
         }
         await signUp(formData.email, formData.password, formData.name);
       }

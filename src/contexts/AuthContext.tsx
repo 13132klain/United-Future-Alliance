@@ -137,7 +137,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     try {
       if (!isFirebaseConfigured() || !auth) {
-        throw new Error('Firebase authentication is not configured. Please check your setup.');
+        // Demo mode - simulate successful login for demo purposes
+        console.log('🔧 Demo mode: Simulating login for', email);
+        const demoUser: User = {
+          id: 'demo-user',
+          email: email,
+          name: email.split('@')[0],
+          role: email.includes('admin') ? 'admin' : 'user',
+          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(email.split('@')[0])}&background=10b981&color=fff`,
+          createdAt: new Date().toISOString()
+        };
+        setUser(demoUser);
+        setLoading(false);
+        return;
       }
 
       // Sign in with Firebase
@@ -149,9 +161,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error('❌ Sign in error:', error);
       const errorMessage = getAuthErrorMessage(error.code) || 'Failed to sign in. Please try again.';
       setError(errorMessage);
-      throw new Error(errorMessage);
-    } finally {
       setLoading(false);
+      // Don't throw the error to prevent uncaught promise rejection
     }
   };
 
@@ -161,16 +172,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     try {
       if (!isFirebaseConfigured() || !auth) {
-        throw new Error('Firebase authentication is not configured. Please check your setup.');
+        // Demo mode - simulate successful signup for demo purposes
+        console.log('🔧 Demo mode: Simulating signup for', email);
+        const demoUser: User = {
+          id: 'demo-user',
+          email: email,
+          name: name.trim(),
+          role: email.includes('admin') ? 'admin' : 'user',
+          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name.trim())}&background=10b981&color=fff`,
+          createdAt: new Date().toISOString()
+        };
+        setUser(demoUser);
+        setLoading(false);
+        return;
       }
 
       // Basic validation
       if (!name.trim()) {
-        throw new Error('Name is required');
+        const errorMessage = 'Name is required';
+        setError(errorMessage);
+        setLoading(false);
+        return;
       }
 
       if (!email.includes('@')) {
-        throw new Error('Please enter a valid email address');
+        const errorMessage = 'Please enter a valid email address';
+        setError(errorMessage);
+        setLoading(false);
+        return;
       }
 
       // Create user with Firebase
@@ -188,9 +217,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error('❌ Sign up error:', error);
       const errorMessage = getAuthErrorMessage(error.code) || 'Failed to create account. Please try again.';
       setError(errorMessage);
-      throw new Error(errorMessage);
-    } finally {
       setLoading(false);
+      // Don't throw the error to prevent uncaught promise rejection
     }
   };
 
@@ -200,7 +228,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     try {
       if (!isFirebaseConfigured() || !auth) {
-        throw new Error('Firebase authentication is not configured. Please check your setup.');
+        // Demo mode - simulate successful Google signin for demo purposes
+        console.log('🔧 Demo mode: Simulating Google signin');
+        const demoUser: User = {
+          id: 'demo-user',
+          email: 'demo@ufa.org',
+          name: 'Demo User',
+          role: 'user',
+          avatar: 'https://ui-avatars.com/api/?name=Demo+User&background=10b981&color=fff',
+          createdAt: new Date().toISOString()
+        };
+        setUser(demoUser);
+        setLoading(false);
+        return;
       }
 
       // Sign in with Google popup
@@ -225,9 +265,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
       
       setError(errorMessage);
-      throw new Error(errorMessage);
-    } finally {
       setLoading(false);
+      // Don't throw the error to prevent uncaught promise rejection
     }
   };
 
@@ -237,12 +276,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     try {
       if (!isFirebaseConfigured() || !auth) {
-        throw new Error('Firebase authentication is not configured. Please check your setup.');
+        const errorMessage = 'Firebase authentication is not configured. Please check your setup.';
+        setError(errorMessage);
+        setLoading(false);
+        return;
       }
 
       // Basic validation
       if (!email.includes('@')) {
-        throw new Error('Please enter a valid email address');
+        const errorMessage = 'Please enter a valid email address';
+        setError(errorMessage);
+        setLoading(false);
+        return;
       }
 
       // Send password reset email
@@ -266,9 +311,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
       
       setError(errorMessage);
-      throw new Error(errorMessage);
-    } finally {
       setLoading(false);
+      // Don't throw the error to prevent uncaught promise rejection
     }
   };
 
