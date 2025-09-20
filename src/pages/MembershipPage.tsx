@@ -98,6 +98,47 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
     setShowPayment(true);
   };
 
+  // Debug function to test membership submission without payment
+  const handleTestSubmit = async () => {
+    setSubmitting(true);
+    
+    try {
+      const membershipData: Omit<Membership, 'id'> = {
+        firstName: formData.firstName || 'Test',
+        lastName: formData.lastName || 'User',
+        email: formData.email || 'test@example.com',
+        phone: formData.phone || '+254700000000',
+        dateOfBirth: new Date(formData.dateOfBirth || '1990-01-01'),
+        gender: formData.gender,
+        county: formData.county || 'Nairobi',
+        constituency: formData.constituency || 'Test Constituency',
+        ward: formData.ward || undefined,
+        occupation: formData.occupation || 'Test Occupation',
+        organization: formData.organization || undefined,
+        interests: formData.interests.length > 0 ? formData.interests : ['Technology'],
+        motivation: formData.motivation || 'Test motivation',
+        howDidYouHear: formData.howDidYouHear || 'website',
+        isVolunteer: formData.isVolunteer,
+        volunteerAreas: formData.isVolunteer ? formData.volunteerAreas : undefined,
+        status: 'pending',
+        submittedAt: new Date(),
+        registrationFee: 200,
+        monthlyContribution: 100,
+        feeAgreement: true
+      };
+
+      console.log('🧪 TEST: Submitting membership application:', membershipData);
+      const membershipId = await membershipsService.addMembership(membershipData);
+      console.log('🧪 TEST: Membership application submitted successfully with ID:', membershipId);
+      
+      setSubmitted(true);
+    } catch (error) {
+      console.error('🧪 TEST: Error submitting membership application:', error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const handlePaymentSuccess = async (paymentData: any) => {
     setSubmitting(true);
     
@@ -689,6 +730,16 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
                     className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     Cancel
+                  </button>
+                  
+                  {/* Debug Test Button - Remove in production */}
+                  <button
+                    type="button"
+                    onClick={handleTestSubmit}
+                    disabled={submitting}
+                    className="px-6 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    🧪 Test Submit (Debug)
                   </button>
                 </div>
               </form>

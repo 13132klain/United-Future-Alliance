@@ -475,7 +475,12 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
           case 'donations':
             return <DonationsManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
           case 'memberships':
-            return <MembershipsManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
+            return (
+              <div className="space-y-6">
+                <MembershipDebugger />
+                <MembershipsManager onClose={() => {}} onActivityUpdate={addRecentActivity} />
+              </div>
+            );
           case 'constitution':
             return <ConstitutionManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
           case 'voter-guide':
