@@ -16,6 +16,7 @@ import {
 import { db, isFirebaseConfigured, firebaseInitialized } from './firebase';
 import { Event, NewsItem, Leader, Membership } from '../types';
 import indexedDBMembershipService from './indexedDBMembershipService';
+import { emailService } from './emailService';
 
 // Mock data for fallback mode
 let mockEvents: Event[] = [
@@ -607,6 +608,27 @@ export const membershipsService = {
       });
       
       console.log('✅ Membership added to Firestore with registration ID:', registrationId);
+      
+      // Send confirmation email
+      try {
+        await emailService.sendMembershipConfirmation({
+          to: membership.email,
+          firstName: membership.firstName,
+          lastName: membership.lastName,
+          registrationId: registrationId,
+          applicationDate: new Date().toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })
+        });
+        console.log('✅ Membership confirmation email sent');
+      } catch (emailError) {
+        console.error('❌ Failed to send membership confirmation email:', emailError);
+        // Don't fail the membership if email fails
+      }
+      
       return { id: docRef.id, registrationId };
     } catch (error) {
       console.error('Error adding membership to Firestore:', error);

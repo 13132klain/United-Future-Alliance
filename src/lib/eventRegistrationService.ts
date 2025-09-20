@@ -1,6 +1,7 @@
 import { EventRegistration } from '../types';
 import { db, firebaseInitialized } from './firebase';
 import { collection, addDoc, getDocs, query, where, updateDoc, doc, serverTimestamp, orderBy } from 'firebase/firestore';
+import { emailService } from './emailService';
 
 // IndexedDB fallback for event registrations
 class IndexedDBEventRegistrationService {
@@ -263,6 +264,29 @@ export const eventRegistrationService = {
         console.log('✅ Firebase not properly initialized, using IndexedDB for event registration');
         const result = await indexedDBEventRegistrationService.addEventRegistration(registrationData);
         console.log('✅ IndexedDB addEventRegistration result:', result);
+        
+        // Send confirmation email
+        try {
+          await emailService.sendEventRegistrationConfirmation({
+            to: userDetails.email,
+            firstName: userDetails.firstName,
+            lastName: userDetails.lastName,
+            eventTitle: eventTitle,
+            eventDate: new Date().toLocaleDateString('en-US', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            }),
+            eventLocation: 'Event Location', // This should come from the event data
+            confirmationCode: confirmationCode
+          });
+          console.log('✅ Event registration confirmation email sent');
+        } catch (emailError) {
+          console.error('❌ Failed to send confirmation email:', emailError);
+          // Don't fail the registration if email fails
+        }
+        
         return {
           success: true,
           message: `Event registration confirmed! You will receive event details via email. Confirmation Code: ${confirmationCode}`,
@@ -280,6 +304,29 @@ export const eventRegistrationService = {
         });
         
         console.log('✅ Event registration added to Firestore with ID:', docRef.id);
+        
+        // Send confirmation email
+        try {
+          await emailService.sendEventRegistrationConfirmation({
+            to: userDetails.email,
+            firstName: userDetails.firstName,
+            lastName: userDetails.lastName,
+            eventTitle: eventTitle,
+            eventDate: new Date().toLocaleDateString('en-US', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            }),
+            eventLocation: 'Event Location', // This should come from the event data
+            confirmationCode: confirmationCode
+          });
+          console.log('✅ Event registration confirmation email sent');
+        } catch (emailError) {
+          console.error('❌ Failed to send confirmation email:', emailError);
+          // Don't fail the registration if email fails
+        }
+        
         return {
           success: true,
           message: `Event registration confirmed! You will receive event details via email. Confirmation Code: ${confirmationCode}`,
