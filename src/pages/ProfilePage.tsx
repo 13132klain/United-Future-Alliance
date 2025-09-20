@@ -63,8 +63,11 @@ export default function ProfilePage({ onNavigate }: ProfilePageProps) {
     setLoading(true);
     try {
       // Get user's membership application
+      console.log('👤 Loading profile for user:', user?.email);
       const memberships = await membershipsService.getMemberships();
+      console.log('👤 All memberships:', memberships.map(m => ({ email: m.email, name: `${m.firstName} ${m.lastName}`, status: m.status })));
       const userMembership = memberships.find(m => m.email === user?.email);
+      console.log('👤 Found user membership:', userMembership);
       
       if (userMembership) {
         setMembership(userMembership);
@@ -86,6 +89,8 @@ export default function ProfilePage({ onNavigate }: ProfilePageProps) {
           isVolunteer: userMembership.isVolunteer,
           volunteerAreas: userMembership.volunteerAreas || []
         });
+      } else {
+        console.log('👤 No membership found for user:', user?.email);
       }
     } catch (error) {
       console.error('Error loading user profile:', error);

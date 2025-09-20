@@ -132,6 +132,7 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
         feeAgreement: formData.feeAgreement
       };
 
+      console.log('📝 Submitting membership application:', membershipData);
       const membershipId = await membershipsService.addMembership(membershipData);
       console.log('✅ Membership application submitted successfully with ID:', membershipId);
       
@@ -139,7 +140,7 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
       setShowPayment(false);
       setSubmitted(true);
     } catch (error) {
-      console.error('Error submitting membership application:', error);
+      console.error('❌ Error submitting membership application:', error);
     } finally {
       setSubmitting(false);
     }

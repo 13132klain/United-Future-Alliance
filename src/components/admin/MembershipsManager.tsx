@@ -43,6 +43,13 @@ export default function MembershipsManager({ onClose, onActivityUpdate }: Member
     const unsubscribe = membershipsService.subscribeToMemberships((membershipsData) => {
       console.log('📊 MembershipsManager received data:', membershipsData);
       console.log('📊 Number of memberships:', membershipsData.length);
+      console.log('📊 Membership details:', membershipsData.map(m => ({
+        id: m.id,
+        name: `${m.firstName} ${m.lastName}`,
+        email: m.email,
+        status: m.status,
+        submittedAt: m.submittedAt
+      })));
       setMemberships(membershipsData);
       setLoading(false);
     });
