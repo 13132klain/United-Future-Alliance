@@ -3,12 +3,12 @@ import { MpesaSTKPushRequest, MpesaSTKPushResponse, MpesaPayment } from '../type
 // M-Pesa API configuration
 const MPESA_CONFIG = {
   // These would be environment variables in production
-  consumerKey: process.env.REACT_APP_MPESA_CONSUMER_KEY || 'your_consumer_key',
-  consumerSecret: process.env.REACT_APP_MPESA_CONSUMER_SECRET || 'your_consumer_secret',
-  businessShortCode: process.env.REACT_APP_MPESA_BUSINESS_SHORT_CODE || '174379', // Test shortcode
-  passkey: process.env.REACT_APP_MPESA_PASSKEY || 'your_passkey',
-  environment: process.env.REACT_APP_MPESA_ENVIRONMENT || 'sandbox', // 'sandbox' or 'production'
-  callbackUrl: process.env.REACT_APP_MPESA_CALLBACK_URL || 'https://your-domain.com/api/mpesa/callback',
+  consumerKey: import.meta.env.VITE_MPESA_CONSUMER_KEY || 'your_consumer_key',
+  consumerSecret: import.meta.env.VITE_MPESA_CONSUMER_SECRET || 'your_consumer_secret',
+  businessShortCode: import.meta.env.VITE_MPESA_BUSINESS_SHORT_CODE || '174379', // Test shortcode
+  passkey: import.meta.env.VITE_MPESA_PASSKEY || 'your_passkey',
+  environment: import.meta.env.VITE_MPESA_ENVIRONMENT || 'sandbox', // 'sandbox' or 'production'
+  callbackUrl: import.meta.env.VITE_MPESA_CALLBACK_URL || 'https://your-domain.com/api/mpesa/callback',
 };
 
 // Generate access token for M-Pesa API

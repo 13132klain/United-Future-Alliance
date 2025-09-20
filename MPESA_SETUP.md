@@ -27,13 +27,13 @@ This guide will help you set up M-Pesa payment integration for the UFA membershi
 Create a `.env` file in your project root with the following variables:
 
 ```env
-# M-Pesa API Configuration
-REACT_APP_MPESA_CONSUMER_KEY=your_consumer_key_here
-REACT_APP_MPESA_CONSUMER_SECRET=your_consumer_secret_here
-REACT_APP_MPESA_BUSINESS_SHORT_CODE=174379
-REACT_APP_MPESA_PASSKEY=your_passkey_here
-REACT_APP_MPESA_ENVIRONMENT=sandbox
-REACT_APP_MPESA_CALLBACK_URL=https://your-domain.com/api/mpesa/callback
+# M-Pesa API Configuration (Vite uses VITE_ prefix)
+VITE_MPESA_CONSUMER_KEY=your_consumer_key_here
+VITE_MPESA_CONSUMER_SECRET=your_consumer_secret_here
+VITE_MPESA_BUSINESS_SHORT_CODE=174379
+VITE_MPESA_PASSKEY=your_passkey_here
+VITE_MPESA_ENVIRONMENT=sandbox
+VITE_MPESA_CALLBACK_URL=https://your-domain.com/api/mpesa/callback
 ```
 
 ## Step 4: Testing
@@ -51,7 +51,7 @@ REACT_APP_MPESA_CALLBACK_URL=https://your-domain.com/api/mpesa/callback
 ## Step 5: Production Setup
 
 1. **Switch to Production**:
-   - Change `REACT_APP_MPESA_ENVIRONMENT` to `production`
+   - Change `VITE_MPESA_ENVIRONMENT` to `production`
    - Update API endpoints to production URLs
    - Use your actual business credentials
 
