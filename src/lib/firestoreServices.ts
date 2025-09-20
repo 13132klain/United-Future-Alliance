@@ -509,6 +509,37 @@ export const leadersService = {
 };
 
 
+// Registration ID Generator
+const generateRegistrationId = async (): Promise<string> => {
+  const currentYear = new Date().getFullYear();
+  const prefix = `UFA`;
+  const year = currentYear.toString();
+  
+  try {
+    if (!firebaseInitialized || !db) {
+      // For IndexedDB fallback, use timestamp-based ID
+      const timestamp = Date.now().toString().slice(-6);
+      return `${prefix}/${timestamp}/${year}`;
+    }
+    
+    // Get the count of existing memberships for this year
+    const membershipsRef = collection(db, 'memberships');
+    const q = query(membershipsRef, where('registrationId', '>=', `${prefix}/001/${year}`));
+    const snapshot = await getDocs(q);
+    
+    // Count existing memberships for this year
+    const existingCount = snapshot.docs.length;
+    const nextNumber = (existingCount + 1).toString().padStart(3, '0');
+    
+    return `${prefix}/${nextNumber}/${year}`;
+  } catch (error) {
+    console.error('Error generating registration ID:', error);
+    // Fallback to timestamp-based ID
+    const timestamp = Date.now().toString().slice(-6);
+    return `${prefix}/${timestamp}/${year}`;
+  }
+};
+
 // Membership Service
 export const membershipsService = {
   // Get all memberships
@@ -545,32 +576,42 @@ export const membershipsService = {
   },
 
   // Add new membership
-  async addMembership(membership: Omit<Membership, 'id'>): Promise<string> {
+  async addMembership(membership: Omit<Membership, 'id' | 'registrationId'>): Promise<{id: string, registrationId: string}> {
     console.log('🔍 membershipsService.addMembership called with:', membership);
     console.log('🔍 db value:', db);
     console.log('🔍 isFirebaseConfigured():', isFirebaseConfigured());
     console.log('🔍 firebaseInitialized:', firebaseInitialized);
     
+    // Generate registration ID
+    const registrationId = await generateRegistrationId();
+    console.log('🆔 Generated registration ID:', registrationId);
+    
+    const membershipWithId = {
+      ...membership,
+      registrationId
+    };
+    
     if (!firebaseInitialized || !db) {
       console.log('✅ Firebase not properly initialized, using IndexedDB for membership');
-      const result = await indexedDBMembershipService.addMembership(membership);
+      const result = await indexedDBMembershipService.addMembership(membershipWithId);
       console.log('✅ IndexedDB addMembership result:', result);
-      return result;
+      return { id: result, registrationId };
     }
     
     try {
       const membershipsRef = collection(db, 'memberships');
       const docRef = await addDoc(membershipsRef, {
-        ...membership,
+        ...membershipWithId,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
       
-      return docRef.id;
+      console.log('✅ Membership added to Firestore with registration ID:', registrationId);
+      return { id: docRef.id, registrationId };
     } catch (error) {
       console.error('Error adding membership to Firestore:', error);
       console.log('Falling back to IndexedDB');
-      return await indexedDBMembershipService.addMembership(membership);
+      return await indexedDBMembershipService.addMembership(membershipWithId);
     }
   },
 

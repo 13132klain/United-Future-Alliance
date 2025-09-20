@@ -99,6 +99,7 @@ export default function MembershipDebugger() {
               <h4 className="font-semibold mb-2">Membership Details:</h4>
               {memberships.map((membership, index) => (
                 <div key={membership.id || index} className="text-sm mb-2 p-2 bg-gray-50 rounded">
+                  <p><strong>Reg ID:</strong> <span className="font-mono text-emerald-600">{membership.registrationId || 'N/A'}</span></p>
                   <p><strong>ID:</strong> {membership.id}</p>
                   <p><strong>Name:</strong> {membership.firstName} {membership.lastName}</p>
                   <p><strong>Email:</strong> {membership.email}</p>

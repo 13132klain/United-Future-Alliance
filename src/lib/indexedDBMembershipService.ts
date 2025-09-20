@@ -103,7 +103,7 @@ class IndexedDBMembershipService implements IndexedDBMembershipService {
   /**
    * Add new membership
    */
-  async addMembership(membership: Omit<Membership, 'id'>): Promise<string> {
+  async addMembership(membership: Omit<Membership, 'id'>): Promise<{id: string, registrationId: string}> {
     try {
       const db = await this.initDB();
       const transaction = db.transaction([this.STORE_NAME], 'readwrite');
@@ -122,7 +122,7 @@ class IndexedDBMembershipService implements IndexedDBMembershipService {
       // Notify subscribers
       await this.notifySubscribers();
       
-      return newId;
+      return { id: newId, registrationId: membership.registrationId };
     } catch (error) {
       console.error('Error adding membership to IndexedDB:', error);
       throw error;

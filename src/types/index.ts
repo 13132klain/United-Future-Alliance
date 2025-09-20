@@ -101,6 +101,7 @@ export interface User {
 
 export interface Membership {
   id: string;
+  registrationId: string; // Custom registration ID (e.g., UFA/001/2025)
   firstName: string;
   lastName: string;
   email: string;

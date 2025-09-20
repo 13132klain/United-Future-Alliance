@@ -25,6 +25,7 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
   const [submitting, setSubmitting] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [paymentData, setPaymentData] = useState<any>(null);
+  const [registrationId, setRegistrationId] = useState<string>('');
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -103,7 +104,7 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
     setSubmitting(true);
     
     try {
-      const membershipData: Omit<Membership, 'id'> = {
+      const membershipData: Omit<Membership, 'id' | 'registrationId'> = {
         firstName: formData.firstName || 'Test',
         lastName: formData.lastName || 'User',
         email: formData.email || 'test@example.com',
@@ -128,9 +129,10 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
       };
 
       console.log('🧪 TEST: Submitting membership application:', membershipData);
-      const membershipId = await membershipsService.addMembership(membershipData);
-      console.log('🧪 TEST: Membership application submitted successfully with ID:', membershipId);
+      const result = await membershipsService.addMembership(membershipData);
+      console.log('🧪 TEST: Membership application submitted successfully with ID:', result.id, 'and Registration ID:', result.registrationId);
       
+      setRegistrationId(result.registrationId);
       setSubmitted(true);
     } catch (error) {
       console.error('🧪 TEST: Error submitting membership application:', error);
@@ -143,7 +145,7 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
     setSubmitting(true);
     
     try {
-      const membershipData: Omit<Membership, 'id'> = {
+      const membershipData: Omit<Membership, 'id' | 'registrationId'> = {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
@@ -168,9 +170,10 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
       };
 
       console.log('📝 Submitting membership application:', membershipData);
-      const membershipId = await membershipsService.addMembership(membershipData);
-      console.log('✅ Membership application submitted successfully with ID:', membershipId);
+      const result = await membershipsService.addMembership(membershipData);
+      console.log('✅ Membership application submitted successfully with ID:', result.id, 'and Registration ID:', result.registrationId);
       
+      setRegistrationId(result.registrationId);
       setPaymentData(paymentData);
       setShowPayment(false);
       setSubmitted(true);
@@ -214,6 +217,7 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
     setSubmitted(false);
     setShowPayment(false);
     setPaymentData(null);
+    setRegistrationId('');
   };
 
   if (submitted) {
@@ -225,6 +229,19 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
               <CheckCircle className="w-10 h-10 text-green-600" />
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-4">Application Submitted!</h1>
+            {registrationId && (
+              <div className="bg-blue-50 rounded-lg p-4 mb-6">
+                <p className="text-sm text-blue-800 mb-2">
+                  <strong>Your Registration ID:</strong>
+                </p>
+                <p className="text-2xl font-mono font-bold text-blue-900">
+                  {registrationId}
+                </p>
+                <p className="text-xs text-blue-600 mt-2">
+                  Please save this ID for your records
+                </p>
+              </div>
+            )}
             <p className="text-lg text-gray-600 mb-6">
               Thank you for your interest in joining the United Future Alliance. Your membership application has been received and is under review.
             </p>
