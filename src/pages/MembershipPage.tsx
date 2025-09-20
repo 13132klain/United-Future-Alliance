@@ -21,7 +21,6 @@ interface MembershipPageProps {
 }
 
 export default function MembershipPage({ onNavigate }: MembershipPageProps) {
-  const [showForm, setShowForm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
@@ -232,36 +231,27 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-green-600 via-blue-600 to-red-700 text-white py-20">
+      {/* Compact Header */}
+      <section className="bg-gradient-to-br from-green-600 via-blue-600 to-red-700 text-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="flex justify-center mb-6">
-              <div className="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                <Users className="w-10 h-10" />
+            <div className="flex justify-center mb-4">
+              <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                <Users className="w-6 h-6" />
               </div>
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">
               Join UFA
             </h1>
-            <p className="text-xl md:text-2xl text-green-100 mb-8 max-w-3xl mx-auto">
-              Become part of Kenya's most progressive political movement. Together, we'll build a better future for all Kenyans.
+            <p className="text-sm md:text-base text-green-100 max-w-2xl mx-auto">
+              Become part of Kenya's most progressive political movement
             </p>
-            {!showForm && (
-              <button
-                onClick={() => setShowForm(true)}
-                className="bg-yellow-400 text-gray-900 px-8 py-4 rounded-lg font-semibold hover:bg-yellow-300 transition-colors shadow-lg"
-              >
-                Start Your Application
-              </button>
-            )}
           </div>
         </div>
       </section>
 
-      {/* Benefits Section */}
-      {!showForm && (
-        <section className="py-16 bg-white">
+      {/* Benefits Section - Collapsible */}
+      <section className="py-8 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -348,7 +338,6 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
             </div>
           </div>
         </section>
-      )}
 
       {/* M-Pesa Payment Modal */}
       {showPayment && (
@@ -378,8 +367,7 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
       )}
 
       {/* Membership Form */}
-      {showForm && (
-        <section className="py-16">
+      <section className="py-8">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="bg-white rounded-2xl shadow-xl p-8">
               <div className="text-center mb-8">
@@ -707,7 +695,6 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
             </div>
           </div>
         </section>
-      )}
     </div>
   );
 }
