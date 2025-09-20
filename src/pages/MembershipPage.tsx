@@ -4,16 +4,17 @@ import {
   Calendar, 
   MapPin, 
   Briefcase, 
-  Heart, 
   CheckCircle, 
   Users,
   Target,
   Award,
   CreditCard,
-  DollarSign
+  DollarSign,
+  Smartphone
 } from 'lucide-react';
 import { Membership } from '../types';
 import { membershipsService } from '../lib/firestoreServices';
+import MpesaPayment from '../components/MpesaPayment';
 
 interface MembershipPageProps {
   onNavigate: (page: string) => void;
@@ -23,6 +24,8 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
   const [showForm, setShowForm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [paymentData, setPaymentData] = useState<any>(null);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -96,8 +99,14 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
+    
+    // Show payment flow instead of directly submitting
+    setShowPayment(true);
+  };
 
+  const handlePaymentSuccess = async (paymentData: any) => {
+    setSubmitting(true);
+    
     try {
       const membershipData: Omit<Membership, 'id'> = {
         firstName: formData.firstName,
@@ -119,18 +128,30 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
         status: 'pending',
         submittedAt: new Date(),
         registrationFee: 200,
-        monthlyContribution: 10,
+        monthlyContribution: 100,
         feeAgreement: formData.feeAgreement
       };
 
       const membershipId = await membershipsService.addMembership(membershipData);
       console.log('✅ Membership application submitted successfully with ID:', membershipId);
+      
+      setPaymentData(paymentData);
+      setShowPayment(false);
       setSubmitted(true);
     } catch (error) {
       console.error('Error submitting membership application:', error);
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handlePaymentError = (error: string) => {
+    console.error('Payment error:', error);
+    setShowPayment(false);
+  };
+
+  const handlePaymentCancel = () => {
+    setShowPayment(false);
   };
 
   const resetForm = () => {
@@ -155,6 +176,8 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
     });
     setShowForm(false);
     setSubmitted(false);
+    setShowPayment(false);
+    setPaymentData(null);
   };
 
   if (submitted) {
@@ -174,12 +197,22 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
                 <strong>Membership Fees:</strong>
               </p>
               <p className="text-sm text-gray-600">
-                • Registration Fee: KES 200 (one-time)<br/>
-                • Monthly Contribution: KES 10 per month
+                • Registration Fee: KES 200 (one-time) ✅ Paid<br/>
+                • Monthly Contribution: KES 100 per month
               </p>
+              {paymentData && (
+                <div className="mt-3 p-3 bg-green-100 rounded-lg">
+                  <p className="text-xs text-green-800">
+                    <strong>Payment Confirmation:</strong><br/>
+                    Receipt: {paymentData.mpesaReceiptNumber}<br/>
+                    Amount: KES {paymentData.amount}<br/>
+                    Phone: {paymentData.phoneNumber}
+                  </p>
+                </div>
+              )}
             </div>
             <p className="text-gray-500 mb-8">
-              We'll review your application and get back to you within 5-7 business days. You'll receive an email confirmation with payment instructions shortly.
+              We'll review your application and get back to you within 5-7 business days. You'll receive an email confirmation shortly.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
@@ -302,23 +335,50 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
                     </div>
                     <div>
                       <h4 className="text-lg font-semibold text-gray-900">Monthly Contribution</h4>
-                      <p className="text-2xl font-bold text-blue-600">KES 10</p>
+                      <p className="text-2xl font-bold text-blue-600">KES 100</p>
                     </div>
                   </div>
                   <p className="text-gray-600 text-sm">
-                    Small monthly contribution to support ongoing UFA activities, community programs, and political initiatives across Kenya.
+                    Monthly contribution to support ongoing UFA activities, community programs, and political initiatives across Kenya.
                   </p>
                 </div>
               </div>
               
               <div className="text-center mt-6">
                 <p className="text-sm text-gray-500">
-                  <strong>Total Annual Cost:</strong> KES 320 (KES 200 registration + KES 120 monthly contributions)
+                  <strong>Total Annual Cost:</strong> KES 1,400 (KES 200 registration + KES 1,200 monthly contributions)
                 </p>
               </div>
             </div>
           </div>
         </section>
+      )}
+
+      {/* M-Pesa Payment Modal */}
+      {showPayment && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Smartphone className="w-8 h-8 text-green-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Complete Registration Payment</h3>
+                <p className="text-gray-600">Pay your registration fee to complete your UFA membership application</p>
+              </div>
+              
+              <MpesaPayment
+                amount={200}
+                accountReference={`UFA-${formData.firstName}-${formData.lastName}`}
+                transactionDescription="UFA Membership Registration Fee"
+                onPaymentSuccess={handlePaymentSuccess}
+                onPaymentError={handlePaymentError}
+                onCancel={handlePaymentCancel}
+                isDevelopment={true} // Set to false in production
+              />
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Membership Form */}
@@ -592,13 +652,13 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
                         <div className="text-sm text-gray-600">One-time Registration Fee</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-blue-600 mb-2">KES 10</div>
+                        <div className="text-2xl font-bold text-blue-600 mb-2">KES 100</div>
                         <div className="text-sm text-gray-600">Monthly Contribution</div>
                       </div>
                     </div>
                     <div className="text-center mt-4">
                       <div className="text-sm text-gray-500">
-                        <strong>Total Annual Cost:</strong> KES 320
+                        <strong>Total Annual Cost:</strong> KES 1,400
                       </div>
                     </div>
                   </div>
@@ -613,7 +673,7 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
                       required
                     />
                     <label className="ml-3 text-sm text-gray-700">
-                      <strong>I agree to pay the membership fees:</strong> KES 200 registration fee (one-time) and KES 10 monthly contribution. 
+                      <strong>I agree to pay the membership fees:</strong> KES 200 registration fee (one-time) and KES 100 monthly contribution. 
                       I understand that these fees support UFA's activities and organizational operations. 
                       <span className="text-emerald-600 font-semibold">*</span>
                     </label>
@@ -634,8 +694,8 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
                       </>
                     ) : (
                       <>
-                        <Heart className="w-4 h-4" />
-                        Submit Application
+                        <Smartphone className="w-4 h-4" />
+                        Pay Registration Fee
                       </>
                     )}
                   </button>

@@ -124,8 +124,39 @@ export interface Membership {
   notes?: string;
   // Membership fees
   registrationFee: number; // One-time registration fee (200 KES)
-  monthlyContribution: number; // Monthly contribution (10 KES)
+  monthlyContribution: number; // Monthly contribution (100 KES)
   feeAgreement: boolean; // User agreement to pay fees
+}
+
+export interface MpesaPayment {
+  id: string;
+  phoneNumber: string;
+  amount: number;
+  accountReference: string;
+  transactionDescription: string;
+  status: 'pending' | 'completed' | 'failed' | 'cancelled';
+  merchantRequestId?: string;
+  checkoutRequestId?: string;
+  mpesaReceiptNumber?: string;
+  transactionDate?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface MpesaSTKPushRequest {
+  phoneNumber: string;
+  amount: number;
+  accountReference: string;
+  transactionDescription: string;
+  callbackUrl?: string;
+}
+
+export interface MpesaSTKPushResponse {
+  merchantRequestId: string;
+  checkoutRequestId: string;
+  responseCode: string;
+  responseDescription: string;
+  customerMessage: string;
 }
 
 export type NavigationPage = 'home' | 'about' | 'events' | 'community' | 'resources' | 'leadership' | 'donate' | 'membership' | 'login' | 'register' | 'admin' | 'profile';
