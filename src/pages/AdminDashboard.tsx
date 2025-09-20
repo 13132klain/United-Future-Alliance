@@ -14,6 +14,7 @@ import DigitalGuideManager from '../components/admin/DigitalGuideManager';
 import ResearchManager from '../components/admin/ResearchManager';
 import CommunityManager from '../components/admin/CommunityManager';
 import SettingsManager from '../components/admin/SettingsManager';
+import EventRegistrationsManager from '../components/admin/EventRegistrationsManager';
 import FirebaseStatus from '../components/FirebaseStatus';
 import MembershipDebugger from '../components/MembershipDebugger';
 import FirebaseConnectionTest from '../components/FirebaseConnectionTest';
@@ -229,6 +230,7 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
     { id: 'resources', label: 'Resources', icon: FileText }, 
     { id: 'donations', label: 'Donations', icon: Heart },   
     { id: 'memberships', label: 'Memberships', icon: Users },
+    { id: 'event-registrations', label: 'Event Registrations', icon: Calendar },
     { id: 'constitution', label: 'Constitution', icon: FileText },
     { id: 'voter-guide', label: 'Voter Guide', icon: Users },
     { id: 'action-toolkit', label: 'Action Toolkit', icon: FileText },
@@ -483,6 +485,8 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
                 <MembershipsManager onClose={() => {}} onActivityUpdate={addRecentActivity} />
               </div>
             );
+          case 'event-registrations':
+            return <EventRegistrationsManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
           case 'constitution':
             return <ConstitutionManager onClose={() => {}} onActivityUpdate={addRecentActivity} />;
           case 'voter-guide':

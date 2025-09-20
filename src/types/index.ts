@@ -160,4 +160,24 @@ export interface MpesaSTKPushResponse {
   customerMessage: string;
 }
 
+export interface EventRegistration {
+  id: string;
+  eventId: string;
+  eventTitle: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  idNumber?: string;
+  county?: string;
+  constituency?: string;
+  interests?: string[];
+  additionalInfo?: string;
+  registrationDate: Date;
+  status: 'pending' | 'confirmed' | 'cancelled';
+  confirmationCode: string;
+  checkedIn?: boolean;
+  checkedInAt?: Date;
+}
+
 export type NavigationPage = 'home' | 'about' | 'events' | 'community' | 'resources' | 'leadership' | 'donate' | 'membership' | 'login' | 'register' | 'admin' | 'profile';

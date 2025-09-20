@@ -2,6 +2,7 @@ import { ArrowRight, Users, Target, Shield, Lightbulb, Calendar, BookOpen, Trend
 import { NavigationPage, NewsItem, Event } from '../types';
 import { useState, useEffect } from 'react';
 import { newsService, eventsService } from '../lib/firestoreServices';
+import EventRegistrationModal from '../components/EventRegistrationModal';
 
 interface HomePageProps {
   onNavigate: (page: NavigationPage) => void;
@@ -13,6 +14,8 @@ export default function HomePage({ onNavigate }: HomePageProps) {
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [showEventModal, setShowEventModal] = useState(false);
+  const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+  const [registrationSuccess, setRegistrationSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -42,6 +45,26 @@ export default function HomePage({ onNavigate }: HomePageProps) {
   const closeEventModal = () => {
     setSelectedEvent(null);
     setShowEventModal(false);
+  };
+
+  const handleRegisterForEvent = () => {
+    if (selectedEvent) {
+      setShowRegistrationModal(true);
+    }
+  };
+
+  const handleRegistrationSuccess = (confirmationCode: string) => {
+    setRegistrationSuccess(confirmationCode);
+    setShowRegistrationModal(false);
+    // Close the event modal after successful registration
+    setTimeout(() => {
+      closeEventModal();
+      setRegistrationSuccess(null);
+    }, 3000);
+  };
+
+  const closeRegistrationModal = () => {
+    setShowRegistrationModal(false);
   };
 
   const getEventIcon = (type: string) => {
@@ -902,7 +925,10 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3">
                 {selectedEvent.registrationRequired ? (
-                  <button className="flex-1 bg-green-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-600 transition-colors flex items-center justify-center gap-2">
+                  <button 
+                    onClick={handleRegisterForEvent}
+                    className="flex-1 bg-green-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
+                  >
                     Register Now
                     <ExternalLink className="w-4 h-4" />
                   </button>
@@ -919,6 +945,31 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                   Close
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Registration Modal */}
+      {selectedEvent && (
+        <EventRegistrationModal
+          event={selectedEvent}
+          isOpen={showRegistrationModal}
+          onClose={closeRegistrationModal}
+          onRegistrationSuccess={handleRegistrationSuccess}
+        />
+      )}
+
+      {/* Registration Success Message */}
+      {registrationSuccess && (
+        <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+          <div className="flex items-center">
+            <div className="w-6 h-6 bg-green-400 rounded-full flex items-center justify-center mr-3">
+              <span className="text-green-800 text-sm font-bold">✓</span>
+            </div>
+            <div>
+              <p className="font-semibold">Registration Successful!</p>
+              <p className="text-sm">Confirmation Code: {registrationSuccess}</p>
             </div>
           </div>
         </div>
