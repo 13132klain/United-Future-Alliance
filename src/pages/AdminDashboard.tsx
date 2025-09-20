@@ -17,6 +17,7 @@ import SettingsManager from '../components/admin/SettingsManager';
 import FirebaseStatus from '../components/FirebaseStatus';
 import MembershipDebugger from '../components/MembershipDebugger';
 import FirebaseConnectionTest from '../components/FirebaseConnectionTest';
+import FileStorageDebugger from '../components/FileStorageDebugger';
 import { eventsService, newsService, leadersService } from '../lib/firestoreServices';
 import { resourcesService, donationsService } from '../lib/mockFirestoreService';
 import { membershipsService } from '../lib/firestoreServices';
@@ -500,6 +501,7 @@ export default function AdminDashboard({ onNavigate }: AdminDashboardProps) {
           <FirebaseStatus />
           <FirebaseConnectionTest />
           <MembershipDebugger />
+          <FileStorageDebugger />
           <SettingsManager onClose={() => {}} />
         </div>
       );

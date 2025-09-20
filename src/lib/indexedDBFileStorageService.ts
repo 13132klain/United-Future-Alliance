@@ -26,7 +26,7 @@ export interface UploadProgress {
 
 class IndexedDBFileStorageService {
   private readonly DB_NAME = 'UFAFileStorage';
-  private readonly DB_VERSION = 1;
+  private readonly DB_VERSION = 2; // Increment version to handle potential schema changes
   private readonly STORE_NAME = 'files';
   private readonly MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
   private readonly ALLOWED_TYPES = ['application/pdf'];
@@ -54,12 +54,16 @@ class IndexedDBFileStorageService {
 
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
+        console.log('🔍 IndexedDB upgrade needed, version:', event.oldVersion, '->', event.newVersion);
         
         // Create object store for files
         if (!db.objectStoreNames.contains(this.STORE_NAME)) {
+          console.log('🔍 Creating new object store:', this.STORE_NAME);
           const store = db.createObjectStore(this.STORE_NAME, { keyPath: 'id' });
           store.createIndex('category', 'category', { unique: false });
           store.createIndex('uploadDate', 'uploadDate', { unique: false });
+        } else {
+          console.log('🔍 Object store already exists:', this.STORE_NAME);
         }
       };
     });
@@ -157,12 +161,16 @@ class IndexedDBFileStorageService {
    */
   async getFilesByCategory(category: string): Promise<FileMetadata[]> {
     try {
+      console.log('🔍 Getting files for category:', category);
       const db = await this.initDB();
       const transaction = db.transaction([this.STORE_NAME], 'readonly');
       const store = transaction.objectStore(this.STORE_NAME);
       const index = store.index('category');
       
       const files = await this.promisifyRequest(index.getAll(category));
+      console.log('🔍 Retrieved files for category', category, ':', files.length, 'files');
+      console.log('🔍 Files details:', files.map(f => ({ id: f.id, name: f.originalName, uploadDate: f.uploadDate })));
+      
       return files.sort((a, b) => new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime());
     } catch (error) {
       console.error('❌ Failed to get files by category:', error);
