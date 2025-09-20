@@ -577,3 +577,4 @@ export default function ResourcesManager({ onClose, onActivityUpdate }: Resource
     </div>
   );
 }
+

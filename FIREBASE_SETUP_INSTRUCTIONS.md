@@ -89,3 +89,4 @@ Once Firebase is connected:
 - Data will persist across browser sessions
 - Real-time updates will work automatically
 - Admin dashboard will have full CRUD functionality
+

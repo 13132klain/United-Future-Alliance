@@ -133,3 +133,4 @@ If you encounter issues:
 2. Verify your environment variables are correct
 3. Ensure you're logged in with an admin email
 4. Check that Firestore is enabled in your Firebase project
+

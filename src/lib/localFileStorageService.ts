@@ -365,3 +365,4 @@ class LocalFileStorageService {
 
 // Export singleton instance
 export const localFileStorageService = new LocalFileStorageService();
+

@@ -691,3 +691,4 @@ export default function DonationsManager({ onClose, onActivityUpdate }: Donation
     </div>
   );
 }
+

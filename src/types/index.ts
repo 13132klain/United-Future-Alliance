@@ -122,6 +122,10 @@ export interface Membership {
   reviewedAt?: Date;
   reviewedBy?: string;
   notes?: string;
+  // Membership fees
+  registrationFee: number; // One-time registration fee (200 KES)
+  monthlyContribution: number; // Monthly contribution (10 KES)
+  feeAgreement: boolean; // User agreement to pay fees
 }
 
 export type NavigationPage = 'home' | 'about' | 'events' | 'community' | 'resources' | 'leadership' | 'donate' | 'membership' | 'login' | 'register' | 'admin' | 'profile';

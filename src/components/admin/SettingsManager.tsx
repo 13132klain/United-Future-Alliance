@@ -429,3 +429,4 @@ export default function SettingsManager({ onClose }: SettingsManagerProps) {
     </div>
   );
 }
+

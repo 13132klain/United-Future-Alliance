@@ -1,18 +1,16 @@
 import React, { useState } from 'react';
 import { 
   User, 
-  Mail, 
-  Phone, 
   Calendar, 
   MapPin, 
   Briefcase, 
   Heart, 
   CheckCircle, 
-  X,
   Users,
   Target,
   Award,
-  Globe
+  CreditCard,
+  DollarSign
 } from 'lucide-react';
 import { Membership } from '../types';
 import { membershipsService } from '../lib/firestoreServices';
@@ -41,7 +39,8 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
     motivation: '',
     howDidYouHear: '',
     isVolunteer: false,
-    volunteerAreas: [] as string[]
+    volunteerAreas: [] as string[],
+    feeAgreement: false
   });
 
   const kenyanCounties = [
@@ -53,10 +52,10 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
     'Nyandarua', 'Murang\'a', 'Kiambu', 'Kirinyaga', 'Nyeri', 'Meru', 'Tharaka Nithi',
     'Embu', 'Kitui', 'Machakos', 'Makueni', 'Kajiado', 'Narok', 'Bomet', 'Kericho',
     'Nandi', 'Uasin Gishu', 'Trans Nzoia', 'West Pokot', 'Samburu', 'Turkana', 'Baringo',
-    'Laikipia', 'Nakuru', 'Nyandarua', 'Murang\'a', 'Kiambu', 'Kirinyaga', 'Nyeri',
+    'Laikipia', 'Nakuru', 'Nyandarua', 'Homabay', 'Kiambu', 'Kirinyaga', 'Nyeri',
     'Meru', 'Tharaka Nithi', 'Embu', 'Kitui', 'Machakos', 'Makueni', 'Kajiado', 'Narok',
     'Bomet', 'Kericho', 'Nandi', 'Uasin Gishu', 'Trans Nzoia', 'West Pokot', 'Samburu',
-    'Turkana', 'Baringo', 'Laikipia'
+    'Turkana', 'Baringo', 'Laikipia','Migori','Kisii','Siaya'
   ];
 
   const interestOptions = [
@@ -118,7 +117,10 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
         isVolunteer: formData.isVolunteer,
         volunteerAreas: formData.isVolunteer ? formData.volunteerAreas : undefined,
         status: 'pending',
-        submittedAt: new Date()
+        submittedAt: new Date(),
+        registrationFee: 200,
+        monthlyContribution: 10,
+        feeAgreement: formData.feeAgreement
       };
 
       const membershipId = await membershipsService.addMembership(membershipData);
@@ -148,7 +150,8 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
       motivation: '',
       howDidYouHear: '',
       isVolunteer: false,
-      volunteerAreas: []
+      volunteerAreas: [],
+      feeAgreement: false
     });
     setShowForm(false);
     setSubmitted(false);
@@ -166,8 +169,17 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
             <p className="text-lg text-gray-600 mb-6">
               Thank you for your interest in joining the United Future Alliance. Your membership application has been received and is under review.
             </p>
+            <div className="bg-emerald-50 rounded-lg p-4 mb-6">
+              <p className="text-sm text-gray-700 mb-2">
+                <strong>Membership Fees:</strong>
+              </p>
+              <p className="text-sm text-gray-600">
+                • Registration Fee: KES 200 (one-time)<br/>
+                • Monthly Contribution: KES 10 per month
+              </p>
+            </div>
             <p className="text-gray-500 mb-8">
-              We'll review your application and get back to you within 5-7 business days. You'll receive an email confirmation shortly.
+              We'll review your application and get back to you within 5-7 business days. You'll receive an email confirmation with payment instructions shortly.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
@@ -252,6 +264,57 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Make Impact</h3>
                 <p className="text-gray-600">Participate in initiatives that directly improve lives in your community and across Kenya.</p>
+              </div>
+            </div>
+            
+            {/* Membership Fees Section */}
+            <div className="mt-16 bg-gradient-to-r from-emerald-50 to-blue-50 rounded-2xl p-8">
+              <div className="text-center mb-8">
+                <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <DollarSign className="w-8 h-8 text-emerald-600" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Affordable Membership</h3>
+                <p className="text-gray-600 max-w-2xl mx-auto">
+                  Join UFA with our simple and affordable membership structure designed to make political participation accessible to all Kenyans.
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <div className="bg-white rounded-xl p-6 shadow-lg">
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mr-4">
+                      <CreditCard className="w-6 h-6 text-emerald-600" />
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-semibold text-gray-900">Registration Fee</h4>
+                      <p className="text-2xl font-bold text-emerald-600">KES 200</p>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 text-sm">
+                    One-time registration fee to become a UFA member. This helps cover administrative costs and supports our organizational activities.
+                  </p>
+                </div>
+                
+                <div className="bg-white rounded-xl p-6 shadow-lg">
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                      <Calendar className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-semibold text-gray-900">Monthly Contribution</h4>
+                      <p className="text-2xl font-bold text-blue-600">KES 10</p>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 text-sm">
+                    Small monthly contribution to support ongoing UFA activities, community programs, and political initiatives across Kenya.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="text-center mt-6">
+                <p className="text-sm text-gray-500">
+                  <strong>Total Annual Cost:</strong> KES 320 (KES 200 registration + KES 120 monthly contributions)
+                </p>
               </div>
             </div>
           </div>
@@ -515,11 +578,53 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
                   )}
                 </div>
 
+                {/* Membership Fee Agreement */}
+                <div className="border-t border-gray-200 pt-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <DollarSign className="w-5 h-5 mr-2 text-emerald-600" />
+                    Membership Fees Agreement
+                  </h3>
+                  
+                  <div className="bg-emerald-50 rounded-lg p-6 mb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-emerald-600 mb-2">KES 200</div>
+                        <div className="text-sm text-gray-600">One-time Registration Fee</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-blue-600 mb-2">KES 10</div>
+                        <div className="text-sm text-gray-600">Monthly Contribution</div>
+                      </div>
+                    </div>
+                    <div className="text-center mt-4">
+                      <div className="text-sm text-gray-500">
+                        <strong>Total Annual Cost:</strong> KES 320
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start">
+                    <input
+                      type="checkbox"
+                      name="feeAgreement"
+                      checked={formData.feeAgreement}
+                      onChange={handleInputChange}
+                      className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded mt-1"
+                      required
+                    />
+                    <label className="ml-3 text-sm text-gray-700">
+                      <strong>I agree to pay the membership fees:</strong> KES 200 registration fee (one-time) and KES 10 monthly contribution. 
+                      I understand that these fees support UFA's activities and organizational operations. 
+                      <span className="text-emerald-600 font-semibold">*</span>
+                    </label>
+                  </div>
+                </div>
+
                 {/* Submit Buttons */}
                 <div className="flex flex-col sm:flex-row gap-4">
                   <button
                     type="submit"
-                    disabled={submitting}
+                    disabled={submitting || !formData.feeAgreement}
                     className="flex-1 bg-emerald-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {submitting ? (

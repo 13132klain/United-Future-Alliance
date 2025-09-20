@@ -670,3 +670,4 @@ export default function CommunityManager({ onClose, onActivityUpdate }: Communit
     </div>
   );
 }
+

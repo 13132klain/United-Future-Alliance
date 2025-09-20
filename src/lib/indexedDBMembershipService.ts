@@ -308,3 +308,4 @@ class IndexedDBMembershipService implements IndexedDBMembershipService {
 const indexedDBMembershipService = new IndexedDBMembershipService();
 
 export default indexedDBMembershipService;
+
