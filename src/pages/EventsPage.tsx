@@ -3,6 +3,7 @@ import { Calendar, MapPin, Clock, Users, Video, ExternalLink, X, Mail, Phone } f
 import { Event } from '../types';
 import { eventsService } from '../lib/firestoreServices';
 import EventRegistrationModal from '../components/EventRegistrationModal';
+import { CalendarService } from '../lib/calendarService';
 
 export default function EventsPage() {
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
@@ -228,14 +229,24 @@ export default function EventsPage() {
                     </div>
                   </div>
 
-                  {/* Action Button */}
-                  <button 
-                    onClick={() => openEventModal(event)}
-                    className="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
-                  >
-                    {event.registrationRequired ? 'Register Now' : 'Learn More'}
-                    <ExternalLink className="w-4 h-4" />
-                  </button>
+                  {/* Action Buttons */}
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => CalendarService.openCalendarOptions(event)}
+                      className="flex-1 border-2 border-blue-500 text-blue-500 py-3 rounded-lg font-semibold hover:bg-blue-500 hover:text-white transition-colors flex items-center justify-center gap-2"
+                      title="Add to Calendar"
+                    >
+                      <Calendar className="w-4 h-4" />
+                      Add to Calendar
+                    </button>
+                    <button 
+                      onClick={() => openEventModal(event)}
+                      className="flex-1 bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
+                    >
+                      {event.registrationRequired ? 'Register Now' : 'Learn More'}
+                      <ExternalLink className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -366,6 +377,13 @@ export default function EventsPage() {
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3">
+                <button 
+                  onClick={() => CalendarService.openCalendarOptions(selectedEvent)}
+                  className="flex-1 border-2 border-emerald-500 text-emerald-500 py-3 px-6 rounded-lg font-semibold hover:bg-emerald-500 hover:text-white transition-colors flex items-center justify-center gap-2"
+                >
+                  <Calendar className="w-4 h-4" />
+                  Add to Calendar
+                </button>
                 {selectedEvent.registrationRequired ? (
                   <button 
                     onClick={handleRegisterForEvent}

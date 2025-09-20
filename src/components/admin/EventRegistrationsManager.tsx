@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, CheckCircle, XCircle, Clock, Mail, Phone, MapPin, Calendar, Search, Filter } from 'lucide-react';
+import { Users, CheckCircle, XCircle, Clock, Mail, Phone, MapPin, Calendar, Search, Filter, Trash2, Printer, Download, Eye } from 'lucide-react';
 import { EventRegistration } from '../../types';
 import { eventRegistrationService } from '../../lib/eventRegistrationService';
 
@@ -15,6 +15,8 @@ export default function EventRegistrationsManager({ onClose, onActivityUpdate }:
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [eventFilter, setEventFilter] = useState<string>('all');
   const [selectedRegistration, setSelectedRegistration] = useState<EventRegistration | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [registrationToDelete, setRegistrationToDelete] = useState<EventRegistration | null>(null);
 
   useEffect(() => {
     loadRegistrations();
@@ -60,6 +62,114 @@ export default function EventRegistrationsManager({ onClose, onActivityUpdate }:
       console.error('Error checking in participant:', error);
       alert('Failed to check in participant');
     }
+  };
+
+  const handleDeleteRegistration = async (registrationId: string) => {
+    try {
+      const result = await eventRegistrationService.deleteEventRegistration(registrationId);
+      if (result.success) {
+        await loadRegistrations();
+        onActivityUpdate?.('event-registration', 'Deleted', 'Registration deleted');
+        setShowDeleteModal(false);
+        setRegistrationToDelete(null);
+      } else {
+        alert('Failed to delete registration');
+      }
+    } catch (error) {
+      console.error('Error deleting registration:', error);
+      alert('Failed to delete registration');
+    }
+  };
+
+  const handlePrintRegistrations = () => {
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      const printContent = `
+        <html>
+          <head>
+            <title>Event Registrations - ${new Date().toLocaleDateString()}</title>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 20px; }
+              h1 { color: #10b981; margin-bottom: 20px; }
+              table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+              th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+              th { background-color: #f5f5f5; font-weight: bold; }
+              .status-confirmed { color: green; }
+              .status-pending { color: orange; }
+              .status-cancelled { color: red; }
+              .summary { background-color: #f9f9f9; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+            </style>
+          </head>
+          <body>
+            <h1>Event Registrations Report</h1>
+            <div class="summary">
+              <h3>Summary</h3>
+              <p><strong>Total Registrations:</strong> ${stats.total}</p>
+              <p><strong>Confirmed:</strong> ${stats.confirmed}</p>
+              <p><strong>Pending:</strong> ${stats.pending}</p>
+              <p><strong>Cancelled:</strong> ${stats.cancelled}</p>
+              <p><strong>Checked In:</strong> ${stats.checkedIn}</p>
+              <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Participant</th>
+                  <th>Event</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Status</th>
+                  <th>Registration Date</th>
+                  <th>Confirmation Code</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${filteredRegistrations.map(reg => `
+                  <tr>
+                    <td>${reg.firstName} ${reg.lastName}</td>
+                    <td>${reg.eventTitle}</td>
+                    <td>${reg.email}</td>
+                    <td>${reg.phone}</td>
+                    <td class="status-${reg.status}">${reg.status}</td>
+                    <td>${new Date(reg.registrationDate).toLocaleDateString()}</td>
+                    <td>${reg.confirmationCode}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </body>
+        </html>
+      `;
+      printWindow.document.write(printContent);
+      printWindow.document.close();
+      printWindow.print();
+    }
+  };
+
+  const handleExportRegistrations = () => {
+    const csvContent = [
+      ['Participant Name', 'Event', 'Email', 'Phone', 'Status', 'Registration Date', 'Confirmation Code', 'Checked In'],
+      ...filteredRegistrations.map(reg => [
+        `${reg.firstName} ${reg.lastName}`,
+        reg.eventTitle,
+        reg.email,
+        reg.phone,
+        reg.status,
+        new Date(reg.registrationDate).toLocaleDateString(),
+        reg.confirmationCode,
+        reg.checkedIn ? 'Yes' : 'No'
+      ])
+    ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `event-registrations-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const filteredRegistrations = registrations.filter(registration => {
@@ -128,12 +238,30 @@ export default function EventRegistrationsManager({ onClose, onActivityUpdate }:
           <h2 className="text-2xl font-bold text-gray-900">Event Registrations</h2>
           <p className="text-gray-600">Manage and track event registrations</p>
         </div>
-        <button
-          onClick={onClose}
-          className="text-gray-400 hover:text-gray-600 transition-colors"
-        >
-          <XCircle className="w-6 h-6" />
-        </button>
+        <div className="flex items-center space-x-3">
+          <button
+            onClick={handlePrintRegistrations}
+            className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            title="Print Registrations"
+          >
+            <Printer className="w-4 h-4 mr-2" />
+            Print
+          </button>
+          <button
+            onClick={handleExportRegistrations}
+            className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            title="Export to CSV"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Export
+          </button>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <XCircle className="w-6 h-6" />
+          </button>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -291,10 +419,18 @@ export default function EventRegistrationsManager({ onClose, onActivityUpdate }:
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
+                      <button
+                        onClick={() => setSelectedRegistration(registration)}
+                        className="text-blue-600 hover:text-blue-900"
+                        title="View Details"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
                       {registration.status === 'pending' && (
                         <button
                           onClick={() => handleStatusUpdate(registration.id, 'confirmed')}
                           className="text-green-600 hover:text-green-900"
+                          title="Confirm Registration"
                         >
                           Confirm
                         </button>
@@ -303,6 +439,7 @@ export default function EventRegistrationsManager({ onClose, onActivityUpdate }:
                         <button
                           onClick={() => handleCheckIn(registration.id)}
                           className="text-blue-600 hover:text-blue-900"
+                          title="Check In Participant"
                         >
                           Check In
                         </button>
@@ -310,11 +447,22 @@ export default function EventRegistrationsManager({ onClose, onActivityUpdate }:
                       {registration.status !== 'cancelled' && (
                         <button
                           onClick={() => handleStatusUpdate(registration.id, 'cancelled')}
-                          className="text-red-600 hover:text-red-900"
+                          className="text-orange-600 hover:text-orange-900"
+                          title="Cancel Registration"
                         >
                           Cancel
                         </button>
                       )}
+                      <button
+                        onClick={() => {
+                          setRegistrationToDelete(registration);
+                          setShowDeleteModal(true);
+                        }}
+                        className="text-red-600 hover:text-red-900"
+                        title="Delete Registration"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -336,6 +484,160 @@ export default function EventRegistrationsManager({ onClose, onActivityUpdate }:
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && registrationToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex items-center mb-4">
+              <Trash2 className="w-6 h-6 text-red-600 mr-3" />
+              <h3 className="text-lg font-semibold text-gray-900">Delete Registration</h3>
+            </div>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete the registration for{' '}
+              <strong>{registrationToDelete.firstName} {registrationToDelete.lastName}</strong> for the event{' '}
+              <strong>{registrationToDelete.eventTitle}</strong>? This action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setRegistrationToDelete(null);
+                }}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDeleteRegistration(registrationToDelete.id)}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Registration Details Modal */}
+      {selectedRegistration && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Registration Details</h3>
+              <button
+                onClick={() => setSelectedRegistration(null)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <XCircle className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Participant Name</label>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {selectedRegistration.firstName} {selectedRegistration.lastName}
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Email</label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedRegistration.email}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Phone</label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedRegistration.phone}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Event</label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedRegistration.eventTitle}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Status</label>
+                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(selectedRegistration.status)}`}>
+                    {selectedRegistration.status}
+                  </span>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Confirmation Code</label>
+                  <p className="mt-1 text-sm text-gray-900 font-mono">{selectedRegistration.confirmationCode}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Registration Date</label>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {new Date(selectedRegistration.registrationDate).toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Checked In</label>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {selectedRegistration.checkedIn ? (
+                      <span className="text-green-600 font-medium">Yes</span>
+                    ) : (
+                      <span className="text-gray-500">No</span>
+                    )}
+                  </p>
+                </div>
+              </div>
+              
+              {selectedRegistration.idNumber && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">ID Number</label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedRegistration.idNumber}</p>
+                </div>
+              )}
+              
+              {selectedRegistration.county && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">County</label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedRegistration.county}</p>
+                </div>
+              )}
+              
+              {selectedRegistration.constituency && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Constituency</label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedRegistration.constituency}</p>
+                </div>
+              )}
+              
+              {selectedRegistration.interests && selectedRegistration.interests.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Interests</label>
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    {selectedRegistration.interests.map((interest, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full"
+                      >
+                        {interest}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {selectedRegistration.additionalInfo && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Additional Information</label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedRegistration.additionalInfo}</p>
+                </div>
+              )}
+            </div>
+            
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setSelectedRegistration(null)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+

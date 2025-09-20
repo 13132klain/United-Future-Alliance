@@ -43,7 +43,8 @@ import {
   Trash2,
   Eye,
   Download,
-  Upload
+  Upload,
+  Mail
 } from 'lucide-react';
 
 interface AdminDashboardProps {

@@ -1,6 +1,6 @@
 import { EventRegistration } from '../types';
 import { db, firebaseInitialized } from './firebase';
-import { collection, addDoc, getDocs, query, where, updateDoc, doc, serverTimestamp, orderBy } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where, updateDoc, doc, serverTimestamp, orderBy, deleteDoc } from 'firebase/firestore';
 import { emailService } from './emailService';
 
 // IndexedDB fallback for event registrations
@@ -124,6 +124,24 @@ class IndexedDBEventRegistrationService {
       await this.notifySubscribers();
     } catch (error) {
       console.error('Error updating event registration in IndexedDB:', error);
+      throw error;
+    }
+  }
+
+  async deleteEventRegistration(id: string): Promise<void> {
+    try {
+      const db = await this.initDB();
+      const transaction = db.transaction([this.STORE_NAME], 'readwrite');
+      const store = transaction.objectStore(this.STORE_NAME);
+      
+      await this.promisifyRequest(store.delete(id));
+      
+      console.log('✅ Event registration deleted from IndexedDB:', id);
+      
+      // Notify subscribers
+      await this.notifySubscribers();
+    } catch (error) {
+      console.error('Error deleting event registration from IndexedDB:', error);
       throw error;
     }
   }
@@ -447,6 +465,47 @@ export const eventRegistrationService = {
       return {
         success: false,
         message: 'Failed to check in participant'
+      };
+    }
+  },
+
+  // Delete event registration (for admin use)
+  async deleteEventRegistration(registrationId: string): Promise<{ success: boolean; message: string }> {
+    console.log('🔍 eventRegistrationService.deleteEventRegistration called for registration:', registrationId);
+    
+    try {
+      if (!firebaseInitialized || !db) {
+        console.log('✅ Firebase not properly initialized, using IndexedDB for event registration deletion');
+        await indexedDBEventRegistrationService.deleteEventRegistration(registrationId);
+        return {
+          success: true,
+          message: 'Event registration deleted successfully'
+        };
+      }
+      
+      try {
+        const registrationRef = doc(db, 'eventRegistrations', registrationId);
+        await deleteDoc(registrationRef);
+        
+        console.log('✅ Event registration deleted from Firestore:', registrationId);
+        return {
+          success: true,
+          message: 'Event registration deleted successfully'
+        };
+      } catch (error) {
+        console.error('Error deleting event registration from Firestore:', error);
+        console.log('Falling back to IndexedDB');
+        await indexedDBEventRegistrationService.deleteEventRegistration(registrationId);
+        return {
+          success: true,
+          message: 'Event registration deleted successfully'
+        };
+      }
+    } catch (error) {
+      console.error('❌ Error deleting event registration:', error);
+      return {
+        success: false,
+        message: 'Failed to delete event registration'
       };
     }
   },

@@ -92,3 +92,4 @@ Once configured, the email service will:
 - Use environment variables for all sensitive data
 - EmailJS handles email delivery securely
 - Templates are customizable and professional
+

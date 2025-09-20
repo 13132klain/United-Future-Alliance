@@ -12,6 +12,7 @@ import {
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db, googleProvider, isFirebaseConfigured } from '../lib/firebase';
 import { User } from '../types';
+import { emailService } from '../lib/emailService';
 
 interface AuthContextType {
   user: User | null;
@@ -183,6 +184,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           createdAt: new Date().toISOString()
         };
         setUser(demoUser);
+        
+        // Send welcome email even in demo mode
+        try {
+          const nameParts = name.trim().split(' ');
+          const firstName = nameParts[0] || name.trim();
+          const lastName = nameParts.slice(1).join(' ') || '';
+          
+          await emailService.sendUserWelcome({
+            to: email,
+            firstName: firstName,
+            lastName: lastName,
+            signupDate: new Date().toLocaleDateString('en-US', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })
+          });
+          console.log('✅ Welcome email sent successfully (demo mode)');
+        } catch (emailError) {
+          console.error('❌ Failed to send welcome email (demo mode):', emailError);
+        }
+        
         setLoading(false);
         return;
       }
@@ -210,6 +234,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         displayName: name.trim(),
         photoURL: `https://ui-avatars.com/api/?name=${encodeURIComponent(name.trim())}&background=10b981&color=fff`
       });
+
+      // Send welcome email
+      try {
+        const nameParts = name.trim().split(' ');
+        const firstName = nameParts[0] || name.trim();
+        const lastName = nameParts.slice(1).join(' ') || '';
+        
+        await emailService.sendUserWelcome({
+          to: email,
+          firstName: firstName,
+          lastName: lastName,
+          signupDate: new Date().toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })
+        });
+        console.log('✅ Welcome email sent successfully');
+      } catch (emailError) {
+        console.error('❌ Failed to send welcome email:', emailError);
+        // Don't fail the signup if email fails
+      }
 
       // User state will be updated by the onAuthStateChanged listener
       console.log('✅ User created successfully:', userCredential.user.email);

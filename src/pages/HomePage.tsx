@@ -3,6 +3,7 @@ import { NavigationPage, NewsItem, Event } from '../types';
 import { useState, useEffect } from 'react';
 import { newsService, eventsService } from '../lib/firestoreServices';
 import EventRegistrationModal from '../components/EventRegistrationModal';
+import { CalendarService } from '../lib/calendarService';
 
 interface HomePageProps {
   onNavigate: (page: NavigationPage) => void;
@@ -16,6 +17,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
   const [showEventModal, setShowEventModal] = useState(false);
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [registrationSuccess, setRegistrationSuccess] = useState<string | null>(null);
+  const [showCalendarModal, setShowCalendarModal] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -65,6 +67,18 @@ export default function HomePage({ onNavigate }: HomePageProps) {
 
   const closeRegistrationModal = () => {
     setShowRegistrationModal(false);
+  };
+
+  const handleAddToCalendar = () => {
+    if (upcomingEvents.length > 0) {
+      // If there are upcoming events, show options for the first one
+      // In a real implementation, you might want to show a list of events to choose from
+      CalendarService.openCalendarOptions(upcomingEvents[0]);
+    } else {
+      // If no events, show a message or redirect to events page
+      alert('No upcoming events available. Please check our events page for more information.');
+      onNavigate('events');
+    }
   };
 
   const getEventIcon = (type: string) => {
@@ -757,13 +771,22 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                       </span>
                     </div>
                     
-                    <button 
-                      onClick={() => openEventModal(event)}
-                      className="group/btn bg-emerald-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-emerald-700 transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105"
-                    >
-                      {event.registrationRequired ? 'Register Now' : 'Learn More'}
-                      <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => CalendarService.openCalendarOptions(event)}
+                        className="group/btn border-2 border-emerald-600 text-emerald-600 px-4 py-2 rounded-lg font-semibold hover:bg-emerald-600 hover:text-white transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105"
+                        title="Add to Calendar"
+                      >
+                        <Calendar className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => openEventModal(event)}
+                        className="group/btn bg-emerald-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-emerald-700 transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105"
+                      >
+                        {event.registrationRequired ? 'Register Now' : 'Learn More'}
+                        <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -786,7 +809,10 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                   View All Events
                   <ArrowRight className="w-4 h-4" />
                 </button>
-                <button className="border-2 border-emerald-600 text-emerald-600 px-8 py-3 rounded-lg font-semibold hover:bg-emerald-600 hover:text-white transition-colors flex items-center justify-center gap-2">
+                <button 
+                  onClick={handleAddToCalendar}
+                  className="border-2 border-emerald-600 text-emerald-600 px-8 py-3 rounded-lg font-semibold hover:bg-emerald-600 hover:text-white transition-colors flex items-center justify-center gap-2"
+                >
                   <Calendar className="w-4 h-4" />
                   Add to Calendar
                 </button>

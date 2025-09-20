@@ -313,6 +313,21 @@ export default function EmailManager({ onClose, onActivityUpdate }: EmailManager
               </div>
             </div>
 
+            {/* User Welcome Template */}
+            <div className="bg-white border border-gray-200 rounded-lg p-6">
+              <div className="flex items-center mb-4">
+                <Users className="w-5 h-5 text-blue-500 mr-2" />
+                <h4 className="font-semibold text-gray-900">User Welcome</h4>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">
+                Sent automatically when new users create an account.
+              </p>
+              <div className="text-xs text-gray-500">
+                <p><strong>Subject:</strong> Welcome to United Future Alliance!</p>
+                <p><strong>Includes:</strong> Account details, what you can do, membership offer</p>
+              </div>
+            </div>
+
             {/* Custom Email Template */}
             <div className="bg-white border border-gray-200 rounded-lg p-6">
               <div className="flex items-center mb-4">
@@ -399,3 +414,4 @@ export default function EmailManager({ onClose, onActivityUpdate }: EmailManager
     </div>
   );
 }
+
