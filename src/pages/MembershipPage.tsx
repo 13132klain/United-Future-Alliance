@@ -47,18 +47,13 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
   });
 
   const kenyanCounties = [
-    'Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret', 'Thika', 'Malindi', 'Kitale',
-    'Garissa', 'Kakamega', 'Nyeri', 'Meru', 'Machakos', 'Kitui', 'Embu', 'Isiolo',
-    'Marsabit', 'Mandera', 'Wajir', 'Tana River', 'Lamu', 'Taita Taveta', 'Kilifi',
-    'Kwale', 'Makueni', 'Kajiado', 'Narok', 'Bomet', 'Kericho', 'Nandi', 'Uasin Gishu',
-    'Trans Nzoia', 'West Pokot', 'Samburu', 'Turkana', 'Baringo', 'Laikipia', 'Nakuru',
-    'Nyandarua', 'Murang\'a', 'Kiambu', 'Kirinyaga', 'Nyeri', 'Meru', 'Tharaka Nithi',
-    'Embu', 'Kitui', 'Machakos', 'Makueni', 'Kajiado', 'Narok', 'Bomet', 'Kericho',
-    'Nandi', 'Uasin Gishu', 'Trans Nzoia', 'West Pokot', 'Samburu', 'Turkana', 'Baringo',
-    'Laikipia', 'Nakuru', 'Nyandarua', 'Homabay', 'Kiambu', 'Kirinyaga', 'Nyeri',
-    'Meru', 'Tharaka Nithi', 'Embu', 'Kitui', 'Machakos', 'Makueni', 'Kajiado', 'Narok',
-    'Bomet', 'Kericho', 'Nandi', 'Uasin Gishu', 'Trans Nzoia', 'West Pokot', 'Samburu',
-    'Turkana', 'Baringo', 'Laikipia','Migori','Kisii','Siaya'
+    'Baringo', 'Bomet', 'Bungoma', 'Busia', 'Elgeyo-Marakwet', 'Embu', 'Garissa',
+    'Homa Bay', 'Isiolo', 'Kajiado', 'Kakamega', 'Kericho', 'Kiambu', 'Kilifi',
+    'Kirinyaga', 'Kisii', 'Kisumu', 'Kitui', 'Kwale', 'Laikipia', 'Lamu',
+    'Machakos', 'Makueni', 'Mandera', 'Marsabit', 'Meru', 'Migori', 'Mombasa',
+    'Murang\'a', 'Nairobi', 'Nakuru', 'Nandi', 'Narok', 'Nyamira', 'Nyandarua',
+    'Nyeri', 'Samburu', 'Siaya', 'Taita-Taveta', 'Tana River', 'Tharaka-Nithi',
+    'Trans Nzoia', 'Turkana', 'Uasin Gishu', 'Vihiga', 'Wajir', 'West Pokot'
   ];
 
   const interestOptions = [
