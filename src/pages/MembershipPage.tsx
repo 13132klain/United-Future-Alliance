@@ -78,7 +78,7 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
     
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked;
-      if (name === 'isVolunteer') {
+      if (name === 'isVolunteer' || name === 'feeAgreement') {
         setFormData(prev => ({ ...prev, [name]: checked }));
       } else {
         // Handle interest and volunteer area checkboxes
