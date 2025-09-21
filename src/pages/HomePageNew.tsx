@@ -1,4 +1,4 @@
-import { ArrowRight, Users, Target, Shield, Lightbulb, Calendar, TrendingUp, X, MapPin, Clock, ChevronRight, CheckCircle, BookOpen } from 'lucide-react';
+import { ArrowRight, Users, Target, Shield, Lightbulb, Calendar, BookOpen, TrendingUp, X, MapPin, Clock, Mail, Phone, ExternalLink, CheckCircle, Star, ChevronRight } from 'lucide-react';
 import { NavigationPage, NewsItem, Event } from '../types';
 import { useState, useEffect } from 'react';
 import { newsService, eventsService } from '../lib/firestoreServices';
@@ -16,20 +16,19 @@ export default function HomePage({ onNavigate }: HomePageProps) {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [showEventModal, setShowEventModal] = useState(false);
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
-  const [registrationSuccess] = useState<string | null>(null);
+  const [registrationSuccess, setRegistrationSuccess] = useState<string | null>(null);
+  const [showCalendarModal, setShowCalendarModal] = useState(false);
 
   useEffect(() => {
     setLoading(true);
     
     // Set up real-time subscriptions for live updates
     const unsubscribeNews = newsService.subscribeToLatestNews((news) => {
-      console.log('📰 News loaded:', news.length, 'items');
       setNewsItems(news.slice(0, 3));
       setLoading(false);
     }, 3);
 
     const unsubscribeEvents = eventsService.subscribeToUpcomingEvents((events) => {
-      console.log('📅 Events loaded:', events.length, 'events');
       setUpcomingEvents(events.slice(0, 2));
     }, 2);
 
@@ -39,6 +38,11 @@ export default function HomePage({ onNavigate }: HomePageProps) {
       unsubscribeEvents();
     };
   }, []);
+
+  const openEventModal = (event: Event) => {
+    setSelectedEvent(event);
+    setShowEventModal(true);
+  };
 
   const closeEventModal = () => {
     setSelectedEvent(null);
@@ -51,6 +55,15 @@ export default function HomePage({ onNavigate }: HomePageProps) {
     }
   };
 
+  const handleRegistrationSuccess = (confirmationCode: string) => {
+    setRegistrationSuccess(confirmationCode);
+    setShowRegistrationModal(false);
+    // Close the event modal after successful registration
+    setTimeout(() => {
+      closeEventModal();
+      setRegistrationSuccess(null);
+    }, 3000);
+  };
 
   const closeRegistrationModal = () => {
     setShowRegistrationModal(false);
@@ -96,11 +109,11 @@ export default function HomePage({ onNavigate }: HomePageProps) {
           {/* Main Content */}
           <div className="text-center mb-16">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              <span className="marker-highlight">Turn Your <span className="text-blue-600">Kenya</span> Into a 
+              Turn Your <span className="text-blue-600">Kenya</span> Into a 
               <br />
               <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
                 Progressive Future
-              </span></span>
+              </span>
             </h1>
             <p className="text-xl sm:text-2xl text-gray-600 max-w-4xl mx-auto mb-8 leading-relaxed">
               We help Kenyans build a united, inclusive, and sustainable future through 
@@ -119,13 +132,13 @@ export default function HomePage({ onNavigate }: HomePageProps) {
 
           {/* Before/After Comparison */}
           <div className="relative max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
               {/* Before Card */}
               <div className="relative">
                 <div className="text-center mb-4">
                   <span className="text-gray-500 text-sm font-medium">Before</span>
                 </div>
-                <div className="bg-white rounded-2xl shadow-xl p-6 transform -rotate-1 hover:rotate-0 transition-transform duration-300">
+                <div className="bg-white rounded-2xl shadow-xl p-6 transform -rotate-2 hover:rotate-0 transition-transform duration-300">
                   <div className="flex items-center space-x-4 mb-4">
                     <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center">
                       <Users className="w-8 h-8 text-gray-600" />
@@ -151,12 +164,19 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                 </div>
               </div>
 
+              {/* Arrow */}
+              <div className="hidden lg:flex justify-center">
+                <div className="bg-blue-100 rounded-full p-4">
+                  <ArrowRight className="w-8 h-8 text-blue-600" />
+                </div>
+              </div>
+
               {/* After Card */}
               <div className="relative">
                 <div className="text-center mb-4">
                   <span className="text-gray-500 text-sm font-medium">After</span>
                 </div>
-                <div className="bg-white rounded-2xl shadow-xl p-6 transform rotate-1 hover:rotate-0 transition-transform duration-300">
+                <div className="bg-white rounded-2xl shadow-xl p-6 transform rotate-2 hover:rotate-0 transition-transform duration-300">
                   <div className="flex items-center space-x-4 mb-4">
                     <div className="w-16 h-16 bg-gradient-to-r from-red-500 to-blue-500 rounded-full flex items-center justify-center">
                       <Target className="w-8 h-8 text-white" />
@@ -182,13 +202,6 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                 </div>
               </div>
             </div>
-
-            {/* Arrow between cards - positioned absolutely */}
-            <div className="hidden lg:block absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
-              <div className="bg-white rounded-full p-3 shadow-lg border-2 border-blue-100">
-                <ArrowRight className="w-6 h-6 text-blue-600" />
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -198,7 +211,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
-              <span className="marker-highlight">How We Transform Kenya</span>
+              How We Transform Kenya
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Our comprehensive approach to building a better future for all Kenyans
@@ -242,86 +255,36 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         </div>
       </section>
 
-
-      {/* Upcoming Events Section */}
-      <section className="py-20 bg-white">
+      {/* Stats Section */}
+      <section className="py-20 bg-gradient-to-r from-red-600 to-blue-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
-              <span className="marker-highlight">Upcoming Events</span>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+              Our Impact Across Kenya
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Join us for our upcoming rallies, meetings, and community events
+            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+              Real results from our community-driven initiatives
             </p>
           </div>
 
-          {upcomingEvents.length === 0 ? (
-            <div className="text-center py-12">
-              <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No upcoming events</h3>
-              <p className="text-gray-500 mb-6">Check back later for new events and activities.</p>
-              <button
-                onClick={() => onNavigate('events')}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-              >
-                View All Events
-              </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="text-center">
+              <div className="text-4xl sm:text-5xl font-bold mb-2">10,000+</div>
+              <div className="text-blue-100">Active Members</div>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {upcomingEvents.map((event) => {
-                const EventIcon = getEventIcon(event.type);
-                return (
-                  <div key={event.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-100">
-                    <div className="p-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${getEventTypeColor(event.type)}`}>
-                            <EventIcon className="w-6 h-6" />
-                          </div>
-                          <div>
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${getEventTypeColor(event.type)}`}>
-                              {event.type.charAt(0).toUpperCase() + event.type.slice(1)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
-                        {event.title}
-                      </h3>
-                      
-                      <p className="text-gray-600 line-clamp-3 mb-4">
-                        {event.description}
-                      </p>
-                      
-                      <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4" />
-                          <span>{new Date(event.date).toLocaleDateString()}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4" />
-                          <span>{event.location}</span>
-                        </div>
-                      </div>
-                      
-                      <button
-                        onClick={() => {
-                          setSelectedEvent(event);
-                          setShowEventModal(true);
-                        }}
-                        className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-                      >
-                        <Calendar className="w-4 h-4" />
-                        View Details
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="text-center">
+              <div className="text-4xl sm:text-5xl font-bold mb-2">47</div>
+              <div className="text-blue-100">Counties Reached</div>
             </div>
-          )}
+            <div className="text-center">
+              <div className="text-4xl sm:text-5xl font-bold mb-2">150+</div>
+              <div className="text-blue-100">Community Programs</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl sm:text-5xl font-bold mb-2">25,000+</div>
+              <div className="text-blue-100">Lives Impacted</div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -330,7 +293,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
-              <span className="marker-highlight">Latest Updates</span>
+              Latest Updates
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Stay informed about our latest initiatives and community achievements
@@ -342,18 +305,6 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
               <p className="mt-4 text-gray-600">Loading latest news...</p>
             </div>
-          ) : newsItems.length === 0 ? (
-            <div className="text-center py-12">
-              <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No news available</h3>
-              <p className="text-gray-500 mb-6">Check back later for the latest updates and news.</p>
-              <button
-                onClick={() => onNavigate('resources')}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-              >
-                View Resources
-              </button>
-            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {newsItems.map((item) => (
@@ -364,7 +315,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                         {item.category}
                       </span>
                       <span className="text-gray-500 text-sm">
-                        {new Date(item.publishDate).toLocaleDateString()}
+                        {new Date(item.date).toLocaleDateString()}
                       </span>
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
@@ -392,7 +343,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
       <section className="py-20 bg-gradient-to-br from-red-600 to-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold mb-6">
-            <span className="marker-highlight">Ready to Shape Kenya's Future?</span>
+            Ready to Shape Kenya's Future?
           </h2>
           <p className="text-xl mb-8 text-gray-100">
             Join thousands of Kenyans who are already part of the United Future Alliance. 
@@ -430,7 +381,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                     </div>
                     <div className="flex items-center gap-2">
                       <Clock className="w-5 h-5" />
-                      <span>TBD</span>
+                      <span>{selectedEvent.time}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <MapPin className="w-5 h-5" />
@@ -474,7 +425,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         <EventRegistrationModal
           event={selectedEvent}
           onClose={closeRegistrationModal}
-          isOpen={showRegistrationModal}
+          onSuccess={handleRegistrationSuccess}
         />
       )}
 

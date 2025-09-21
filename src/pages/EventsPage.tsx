@@ -67,6 +67,16 @@ export default function EventsPage() {
         type: 'fundraiser',
         registrationRequired: true,
         image: 'https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg?auto=compress&cs=tinysrgb&w=800'
+      },
+      {
+        id: '5',
+        title: 'UFA Membership Recruitment',
+        description: 'UFA will be recruiting new members to the organization',
+        date: new Date('2025-09-20T17:00:00'),
+        location: 'SafariPark, Nairobi',
+        type: 'meeting',
+        registrationRequired: true,
+        image: 'https://images.pexels.com/photos/289737/pexels-photo-289737.jpeg?auto=compress&cs=tinysrgb&w=800'
       }
     ];
 
@@ -138,7 +148,7 @@ export default function EventsPage() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
-            Events & Activities
+            <span className="marker-highlight">Events & Activities</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Join us at our upcoming events, rallies, and community gatherings. 
@@ -258,7 +268,7 @@ export default function EventsPage() {
         <div className="text-center mt-16">
           <div className="bg-gradient-to-br from-red-50 to-blue-50 p-8 rounded-2xl border border-red-100">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Can't Find What You're Looking For?
+              <span className="marker-highlight">Can't Find What You're Looking For?</span>
             </h2>
             <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
               We're always organizing new events and activities. Stay connected with us 

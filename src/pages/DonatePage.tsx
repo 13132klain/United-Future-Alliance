@@ -74,7 +74,7 @@ export default function DonatePage() {
             <Heart className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
-            Support Kenya's Future
+            <span className="marker-highlight">Support Kenya's Future</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Your contribution helps fund critical initiatives that are building a more 
@@ -84,7 +84,7 @@ export default function DonatePage() {
 
         {/* Active Campaigns */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Active Campaigns</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center"><span className="marker-highlight">Active Campaigns</span></h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {causes.map((cause) => (
               <div key={cause.id} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
@@ -122,7 +122,7 @@ export default function DonatePage() {
 
         {/* Donation Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Make Your Contribution</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center"><span className="marker-highlight">Make Your Contribution</span></h2>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Column - Donation Options */}
@@ -291,7 +291,7 @@ export default function DonatePage() {
 
         {/* Impact Statement */}
         <div className="mt-12 text-center bg-gradient-to-br from-emerald-600 to-green-700 text-white p-12 rounded-2xl">
-          <h2 className="text-3xl font-bold mb-6">Your Impact Matters</h2>
+          <h2 className="text-3xl font-bold mb-6"><span className="marker-highlight">Your Impact Matters</span></h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <div>
               <div className="text-3xl font-bold mb-2">KSh 500</div>

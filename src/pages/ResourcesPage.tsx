@@ -798,7 +798,7 @@ export default function ResourcesPage() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
-            Resources & Learning Hub
+            <span className="marker-highlight">Resources & Learning Hub</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Access our comprehensive collection of policy papers, research reports, educational materials, 
@@ -910,7 +910,7 @@ export default function ResourcesPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
           {/* Civic Education */}
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 rounded-2xl border border-blue-100">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Civic Education Hub</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4"><span className="marker-highlight">Civic Education Hub</span></h2>
             <p className="text-gray-600 mb-6">
               Learn about your rights, responsibilities, and how to participate effectively in Kenya's democracy.
             </p>
@@ -938,7 +938,7 @@ export default function ResourcesPage() {
 
           {/* Research Library */}
           <div className="bg-gradient-to-br from-green-50 to-red-50 p-8 rounded-2xl border border-green-100">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Research Library</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4"><span className="marker-highlight">Research Library</span></h2>
             <p className="text-gray-600 mb-6">
               Access in-depth research on Kenya's development challenges and evidence-based solutions.
             </p>
@@ -967,7 +967,7 @@ export default function ResourcesPage() {
 
         {/* Newsletter Signup */}
         <div className="bg-gradient-to-br from-red-600 to-blue-700 text-white p-12 rounded-2xl text-center">
-          <h2 className="text-3xl font-bold mb-4">Stay Updated</h2>
+          <h2 className="text-3xl font-bold mb-4"><span className="marker-highlight">Stay Updated</span></h2>
           <p className="text-xl mb-8 text-red-100 max-w-2xl mx-auto">
             Subscribe to our newsletter to receive the latest resources, research, and educational materials 
             delivered directly to your inbox.

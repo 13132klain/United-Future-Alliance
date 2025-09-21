@@ -20,6 +20,7 @@ import {
   serverTimestamp 
 } from 'firebase/firestore';
 import { storage, db, isFirebaseConfigured } from './firebase';
+import { indexedDBFileStorageService } from './indexedDBFileStorageService';
 
 export interface FileMetadata {
   id: string;
@@ -57,7 +58,7 @@ class FileStorageService {
   };
 
   /**
-   * Upload a file to Firebase Storage and save metadata to Firestore
+   * Upload a file to IndexedDB (fallback to Firebase Storage if configured)
    */
   async uploadFile(
     file: File, 
@@ -65,22 +66,46 @@ class FileStorageService {
     subcategory?: string,
     metadata?: Partial<FileMetadata>
   ): Promise<{ success: boolean; fileId?: string; downloadURL?: string; error?: string }> {
-    // Check if Firebase is configured
-    if (!isFirebaseConfigured()) {
+    // Use IndexedDB for file storage (no CORS issues)
+    try {
+      console.log('📁 Uploading file to IndexedDB:', file.name);
+      
+      const result = await indexedDBFileStorageService.uploadFile(file, category, subcategory, metadata);
+      
+      if (result.success) {
+        console.log('✅ File uploaded successfully to IndexedDB:', {
+          fileId: result.fileId,
+          fileName: file.name,
+          size: file.size,
+          category
+        });
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('❌ IndexedDB upload failed, trying Firebase fallback:', error);
+      
+      // Fallback to Firebase Storage if IndexedDB fails
+      if (isFirebaseConfigured() && storage && db) {
+        return this.uploadToFirebase(file, category, subcategory, metadata);
+      }
+      
       return {
         success: false,
-        error: 'Firebase is not configured. Please set up your Firebase environment variables.'
+        error: error instanceof Error ? error.message : 'Upload failed'
       };
     }
+  }
 
-    // Check if Firebase services are available
-    if (!storage || !db) {
-      return {
-        success: false,
-        error: 'Firebase services are not initialized. Please check your Firebase configuration.'
-      };
-    }
-
+  /**
+   * Upload to Firebase Storage (fallback method)
+   */
+  private async uploadToFirebase(
+    file: File, 
+    category: string, 
+    subcategory?: string,
+    metadata?: Partial<FileMetadata>
+  ): Promise<{ success: boolean; fileId?: string; downloadURL?: string; error?: string }> {
     try {
       // Generate unique filename
       const timestamp = Date.now();
@@ -123,7 +148,7 @@ class FileStorageService {
       // Save metadata to Firestore
       const docRef = await addDoc(collection(db, this.COLLECTIONS.FILES), fileData);
 
-      console.log('✅ File uploaded successfully:', {
+      console.log('✅ File uploaded successfully to Firebase:', {
         fileId: docRef.id,
         fileName: file.name,
         size: file.size,
@@ -138,7 +163,7 @@ class FileStorageService {
       };
 
     } catch (error) {
-      console.error('❌ File upload failed:', error);
+      console.error('❌ Firebase upload failed:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Upload failed'
@@ -151,23 +176,35 @@ class FileStorageService {
    */
   async getFilesByCategory(category: string): Promise<FileMetadata[]> {
     try {
-      const q = query(
-        collection(db, this.COLLECTIONS.FILES),
-        where('category', '==', category),
-        orderBy('uploadDate', 'desc')
-      );
+      // Use IndexedDB first
+      const indexedDBFiles = await indexedDBFileStorageService.getFilesByCategory(category);
+      
+      if (indexedDBFiles.length > 0) {
+        return indexedDBFiles;
+      }
+      
+      // Fallback to Firebase if no files in IndexedDB
+      if (isFirebaseConfigured() && db) {
+        const q = query(
+          collection(db, this.COLLECTIONS.FILES),
+          where('category', '==', category),
+          orderBy('uploadDate', 'desc')
+        );
 
-      const querySnapshot = await getDocs(q);
-      const files: FileMetadata[] = [];
+        const querySnapshot = await getDocs(q);
+        const files: FileMetadata[] = [];
 
-      querySnapshot.forEach((doc) => {
-        files.push({
-          id: doc.id,
-          ...doc.data()
-        } as FileMetadata);
-      });
+        querySnapshot.forEach((doc) => {
+          files.push({
+            id: doc.id,
+            ...doc.data()
+          } as FileMetadata);
+        });
 
-      return files;
+        return files;
+      }
+      
+      return [];
     } catch (error) {
       console.error('❌ Failed to get files by category:', error);
       return [];

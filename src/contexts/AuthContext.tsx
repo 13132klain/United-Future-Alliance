@@ -9,7 +9,7 @@ import {
   updateProfile,
   User as FirebaseUser
 } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { auth, db, googleProvider, isFirebaseConfigured } from '../lib/firebase';
 import { User } from '../types';
 import { emailService } from '../lib/emailService';
@@ -145,8 +145,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           email: email,
           name: email.split('@')[0],
           role: email.includes('admin') ? 'admin' : 'user',
-          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(email.split('@')[0])}&background=10b981&color=fff`,
-          createdAt: new Date().toISOString()
+          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(email.split('@')[0])}&background=10b981&color=fff`
         };
         setUser(demoUser);
         setLoading(false);
@@ -180,8 +179,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           email: email,
           name: name.trim(),
           role: email.includes('admin') ? 'admin' : 'user',
-          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name.trim())}&background=10b981&color=fff`,
-          createdAt: new Date().toISOString()
+          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name.trim())}&background=10b981&color=fff`
         };
         setUser(demoUser);
         
@@ -282,16 +280,65 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           email: 'demo@ufa.org',
           name: 'Demo User',
           role: 'user',
-          avatar: 'https://ui-avatars.com/api/?name=Demo+User&background=10b981&color=fff',
-          createdAt: new Date().toISOString()
+          avatar: 'https://ui-avatars.com/api/?name=Demo+User&background=10b981&color=fff'
         };
         setUser(demoUser);
+        
+        // Send welcome email even in demo mode
+        try {
+          await emailService.sendUserWelcome({
+            to: demoUser.email,
+            firstName: 'Demo',
+            lastName: 'User',
+            signupDate: new Date().toLocaleDateString('en-US', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })
+          });
+          console.log('✅ Welcome email sent successfully (demo mode)');
+        } catch (emailError) {
+          console.error('❌ Failed to send welcome email (demo mode):', emailError);
+        }
+        
         setLoading(false);
         return;
       }
 
       // Sign in with Google popup
       const result = await signInWithPopup(auth, googleProvider);
+      
+      // Check if this is a new user by comparing creation time with last sign-in time
+      const isNewUser = result.user.metadata.creationTime === result.user.metadata.lastSignInTime;
+      
+      if (isNewUser) {
+        console.log('🎉 New user detected via Google sign-in, sending welcome email');
+        
+        // Send welcome email for new Google users
+        try {
+          const displayName = result.user.displayName || result.user.email?.split('@')[0] || 'User';
+          const nameParts = displayName.split(' ');
+          const firstName = nameParts[0] || displayName;
+          const lastName = nameParts.slice(1).join(' ') || '';
+          
+          await emailService.sendUserWelcome({
+            to: result.user.email || '',
+            firstName: firstName,
+            lastName: lastName,
+            signupDate: new Date().toLocaleDateString('en-US', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })
+          });
+          console.log('✅ Welcome email sent to new Google user:', result.user.email);
+        } catch (emailError) {
+          console.error('❌ Failed to send welcome email to new Google user:', emailError);
+          // Don't fail the sign-in if email fails
+        }
+      }
       
       // User state will be updated by the onAuthStateChanged listener
       console.log('✅ Google sign-in successful:', result.user.email);

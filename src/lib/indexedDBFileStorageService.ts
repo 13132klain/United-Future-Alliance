@@ -29,7 +29,15 @@ class IndexedDBFileStorageService {
   private readonly DB_VERSION = 2; // Increment version to handle potential schema changes
   private readonly STORE_NAME = 'files';
   private readonly MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
-  private readonly ALLOWED_TYPES = ['application/pdf'];
+  private readonly ALLOWED_TYPES = [
+    'application/pdf',
+    'image/jpeg',
+    'image/jpg', 
+    'image/png',
+    'image/gif',
+    'image/webp',
+    'image/svg+xml'
+  ];
   private db: IDBDatabase | null = null;
 
   /**
@@ -385,6 +393,74 @@ class IndexedDBFileStorageService {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     
     return url;
+  }
+
+  /**
+   * Get image URL for display (for images only)
+   * This method regenerates blob URLs each time to ensure persistence
+   */
+  async getImageURL(fileId: string): Promise<string | null> {
+    try {
+      const db = await this.initDB();
+      const transaction = db.transaction([this.STORE_NAME], 'readonly');
+      const store = transaction.objectStore(this.STORE_NAME);
+      const fileRecord = await this.promisifyRequest(store.get(fileId));
+
+      if (!fileRecord || !fileRecord.fileData) {
+        console.log('🔍 No file record or file data found for fileId:', fileId);
+        return null;
+      }
+
+      // Check if it's an image
+      if (!fileRecord.type.startsWith('image/')) {
+        console.log('🔍 File is not an image:', fileRecord.type);
+        return null;
+      }
+
+      // Create a blob from the ArrayBuffer
+      const blob = new Blob([fileRecord.fileData], { type: fileRecord.type });
+      const blobURL = URL.createObjectURL(blob);
+      
+      console.log('✅ Generated new blob URL for image:', {
+        fileId,
+        fileName: fileRecord.originalName,
+        blobURL: blobURL.substring(0, 50) + '...'
+      });
+      
+      return blobURL;
+    } catch (error) {
+      console.error('❌ Failed to get image URL:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Get image URL by file ID (alternative method for compatibility)
+   */
+  async getImageURLByFileId(fileId: string): Promise<string | null> {
+    return this.getImageURL(fileId);
+  }
+
+  /**
+   * Get file as blob for display
+   */
+  async getFileAsBlob(fileId: string): Promise<Blob | null> {
+    try {
+      const db = await this.initDB();
+      const transaction = db.transaction([this.STORE_NAME], 'readonly');
+      const store = transaction.objectStore(this.STORE_NAME);
+      const fileRecord = await this.promisifyRequest(store.get(fileId));
+
+      if (!fileRecord || !fileRecord.fileData) {
+        return null;
+      }
+
+      // Create a blob from the ArrayBuffer
+      return new Blob([fileRecord.fileData], { type: fileRecord.type });
+    } catch (error) {
+      console.error('❌ Failed to get file as blob:', error);
+      return null;
+    }
   }
 
   /**

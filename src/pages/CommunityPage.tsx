@@ -665,7 +665,7 @@ export default function CommunityPage({ onNavigate }: CommunityPageProps) {
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
-            <h1 className="text-4xl sm:text-5xl font-bold mb-6">Community Hub</h1>
+            <h1 className="text-4xl sm:text-5xl font-bold mb-6"><span className="marker-highlight">Community Hub</span></h1>
             <p className="text-xl text-blue-100 max-w-3xl mx-auto">
               Connect with fellow UFA members, join community groups, volunteer for causes you care about, 
               and participate in local events that make a difference.

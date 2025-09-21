@@ -27,6 +27,8 @@ export interface Leader {
   position: string;
   email: string;
   phone: string;
+  image?: string;
+  bio?: string;
   socialLinks?: {
     twitter?: string;
     linkedin?: string;

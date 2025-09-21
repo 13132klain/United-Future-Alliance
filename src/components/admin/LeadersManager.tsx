@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Leader } from '../../types';
 import { leadersService } from '../../lib/firestoreServices';
+import { fileStorageService } from '../../lib/fileStorageService';
+import { indexedDBFileStorageService } from '../../lib/indexedDBFileStorageService';
 import { 
   Plus, 
   Search, 
@@ -13,8 +15,87 @@ import {
   Mail,
   Phone,
   ExternalLink,
-  Loader2
+  Loader2,
+  Upload,
+  Image as ImageIcon,
+  X
 } from 'lucide-react';
+
+// Component to handle async image loading from IndexedDB
+const LeaderImage: React.FC<{ 
+  imageValue: string; 
+  alt: string; 
+  className: string;
+  fallbackInitials: string;
+}> = ({ imageValue, alt, className, fallbackInitials }) => {
+  const [imageURL, setImageURL] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    const loadImage = async () => {
+      if (!imageValue) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(false);
+
+        // If it's already a blob URL, use it directly
+        if (imageValue.startsWith('blob:')) {
+          setImageURL(imageValue);
+          setLoading(false);
+          return;
+        }
+
+        // If it's a fileId, generate a new blob URL
+        if (imageValue.startsWith('file_')) {
+          const url = await indexedDBFileStorageService.getImageURL(imageValue);
+          setImageURL(url);
+        } else {
+          // For other cases (like external URLs), use as is
+          setImageURL(imageValue);
+        }
+      } catch (err) {
+        console.error('Failed to load image:', err);
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadImage();
+  }, [imageValue]);
+
+  if (loading) {
+    return (
+      <div className={`${className} bg-gray-200 flex items-center justify-center`}>
+        <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
+      </div>
+    );
+  }
+
+  if (error || !imageURL) {
+    return (
+      <div className={`${className} bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center`}>
+        <span className="text-white font-bold text-2xl">
+          {fallbackInitials}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <img 
+      src={imageURL} 
+      alt={alt}
+      className={className}
+      onError={() => setError(true)}
+    />
+  );
+};
 
 interface LeadersManagerProps {
   onClose: () => void;
@@ -33,6 +114,7 @@ export default function LeadersManager({ onClose, onActivityUpdate }: LeadersMan
     position: '',
     email: '',
     phone: '',
+    image: '',
     socialLinks: {
       linkedin: '',
       twitter: '',
@@ -40,6 +122,9 @@ export default function LeadersManager({ onClose, onActivityUpdate }: LeadersMan
       instagram: ''
     }
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>('');
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // Load leaders from Firestore
   useEffect(() => {
@@ -76,6 +161,83 @@ export default function LeadersManager({ onClose, onActivityUpdate }: LeadersMan
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
+  // Helper function to get image URL (handles both fileIds and blob URLs)
+  const getImageDisplayURL = async (imageValue: string): Promise<string | null> => {
+    if (!imageValue) return null;
+    
+    // If it's already a blob URL, return it
+    if (imageValue.startsWith('blob:')) {
+      return imageValue;
+    }
+    
+    // If it's a fileId, generate a new blob URL
+    if (imageValue.startsWith('file_')) {
+      try {
+        return await indexedDBFileStorageService.getImageURL(imageValue);
+      } catch (error) {
+        console.error('Failed to get image URL for fileId:', imageValue, error);
+        return null;
+      }
+    }
+    
+    // For other cases (like external URLs), return as is
+    return imageValue;
+  };
+
+  const handleImageUpload = async (file: File) => {
+    setUploadingImage(true);
+    try {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select a valid image file');
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image size must be less than 5MB');
+        return;
+      }
+
+      // Upload to IndexedDB (no CORS issues)
+      const result = await fileStorageService.uploadFile(file, 'leaders');
+      
+      if (result.success && result.fileId) {
+        // Store the fileId instead of blob URL for persistence
+        setFormData({ ...formData, image: result.fileId });
+        
+        // Generate preview URL for immediate display
+        const imageURL = await indexedDBFileStorageService.getImageURL(result.fileId);
+        if (imageURL) {
+          setImagePreview(imageURL);
+          setImageFile(file);
+        } else {
+          alert('Failed to generate image preview');
+        }
+      } else {
+        alert(result.error || 'Failed to upload image');
+      }
+    } catch (error) {
+      console.error('Image upload error:', error);
+      alert('Failed to upload image');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleImageUpload(file);
+    }
+  };
+
+  const removeImage = () => {
+    setFormData({ ...formData, image: '' });
+    setImagePreview('');
+    setImageFile(null);
+  };
+
   const handleAddLeader = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -89,6 +251,7 @@ export default function LeadersManager({ onClose, onActivityUpdate }: LeadersMan
         position: formData.position,
         email: formData.email,
         phone: formData.phone,
+        image: formData.image,
         socialLinks: socialLinks
       };
 
@@ -116,6 +279,7 @@ export default function LeadersManager({ onClose, onActivityUpdate }: LeadersMan
         position: formData.position,
         email: formData.email,
         phone: formData.phone,
+        image: formData.image,
         socialLinks: socialLinks
       };
 
@@ -147,6 +311,7 @@ export default function LeadersManager({ onClose, onActivityUpdate }: LeadersMan
       position: leader.position,
       email: leader.email,
       phone: leader.phone,
+      image: leader.image || '',
       socialLinks: {
         linkedin: leader.socialLinks?.linkedin || '',
         twitter: leader.socialLinks?.twitter || '',
@@ -154,6 +319,8 @@ export default function LeadersManager({ onClose, onActivityUpdate }: LeadersMan
         instagram: leader.socialLinks?.instagram || ''
       }
     });
+    setImagePreview(leader.image || '');
+    setImageFile(null);
   };
 
   const resetForm = () => {
@@ -162,6 +329,7 @@ export default function LeadersManager({ onClose, onActivityUpdate }: LeadersMan
       position: '',
       email: '',
       phone: '',
+      image: '',
       socialLinks: {
         linkedin: '',
         twitter: '',
@@ -169,6 +337,8 @@ export default function LeadersManager({ onClose, onActivityUpdate }: LeadersMan
         instagram: ''
       }
     });
+    setImageFile(null);
+    setImagePreview('');
   };
 
   return (
@@ -237,79 +407,54 @@ export default function LeadersManager({ onClose, onActivityUpdate }: LeadersMan
       {!loading && (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredLeaders.map((leader) => (
-          <div key={leader.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
-            {/* Leader Header */}
-            <div className="p-6 border-b border-gray-100">
-              <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center">
-                  <span className="text-xl font-bold text-emerald-600">
-                    {getInitials(leader.name)}
-                  </span>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900">{leader.name}</h3>
-                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getPositionColor(leader.position)}`}>
-                    {leader.position}
-                  </span>
+          <div key={leader.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+            {/* Full Background Image */}
+            <LeaderImage 
+              imageValue={leader.image || ''}
+              alt={leader.name}
+              className="w-full h-48 object-cover"
+              fallbackInitials={getInitials(leader.name)}
+            />
+            
+            {/* Card Content */}
+            <div className="p-4">
+              {/* Name and Status */}
+              <div className="text-center mb-3">
+                <h3 className="text-lg font-bold text-gray-900 mb-1">{leader.name}</h3>
+                <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                  <span>Active</span>
                 </div>
               </div>
-            </div>
-
-            {/* Leader Details */}
-            <div className="p-6">
-              <div className="space-y-3 mb-4">
-                <div className="flex items-center text-sm text-gray-600">
-                  <Mail className="w-4 h-4 mr-3 text-gray-400" />
+              
+              {/* Position */}
+              <div className="text-center mb-3">
+                <p className="text-sm font-medium text-gray-700">{leader.position}</p>
+              </div>
+              
+              {/* Contact Info */}
+              <div className="mb-4">
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Mail className="w-4 h-4" />
                   <span className="truncate">{leader.email}</span>
                 </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Phone className="w-4 h-4 mr-3 text-gray-400" />
-                  <span>{leader.phone}</span>
-                </div>
               </div>
-
-              {/* Social Links */}
-              {leader.socialLinks && Object.keys(leader.socialLinks).length > 0 && (
-                <div className="mb-4">
-                  <p className="text-sm font-medium text-gray-700 mb-2">Social Links</p>
-                  <div className="flex space-x-2">
-                    {Object.entries(leader.socialLinks).map(([platform, url]) => (
-                      <a
-                        key={platform}
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                        title={`${platform} profile`}
-                      >
-                        <ExternalLink className="w-4 h-4 text-gray-600" />
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Actions */}
-              <div className="flex items-center justify-between">
-                <div className="flex space-x-2">
-                  <button className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors">
-                    <Eye className="w-4 h-4" />
-                  </button>
-                  <button 
-                    onClick={() => openEditModal(leader)}
-                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </button>
-                  <button 
-                    onClick={() => handleDeleteLeader(leader.id)}
-                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-                <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
-                  <MoreVertical className="w-4 h-4" />
+              
+              {/* Action Buttons */}
+              <div className="flex space-x-2">
+                <button 
+                  onClick={() => openEditModal(leader)}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-2 transition-colors duration-200 flex items-center justify-center space-x-2"
+                >
+                  <Edit className="w-4 h-4" />
+                  <span className="text-sm font-medium">Edit</span>
+                </button>
+                <button 
+                  onClick={() => handleDeleteLeader(leader.id)}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white rounded-lg px-3 py-2 transition-colors duration-200 flex items-center justify-center space-x-2"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span className="text-sm font-medium">Delete</span>
                 </button>
               </div>
             </div>
@@ -412,6 +557,60 @@ export default function LeadersManager({ onClose, onActivityUpdate }: LeadersMan
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                     placeholder="Enter phone number"
                   />
+                </div>
+              </div>
+
+              {/* Image Upload */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Profile Image (Optional)
+                </label>
+                <div className="space-y-4">
+                  {/* Image Preview */}
+                  {imagePreview && (
+                    <div className="relative inline-block">
+                      <img 
+                        src={imagePreview} 
+                        alt="Preview" 
+                        className="w-24 h-24 object-cover rounded-lg border border-gray-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                  
+                  {/* Upload Button */}
+                  <div className="flex items-center space-x-4">
+                    <label className="cursor-pointer">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="hidden"
+                        disabled={uploadingImage}
+                      />
+                      <div className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                        {uploadingImage ? (
+                          <Loader2 className="w-4 h-4 animate-spin text-emerald-600" />
+                        ) : (
+                          <Upload className="w-4 h-4 text-gray-600" />
+                        )}
+                        <span className="text-sm text-gray-700">
+                          {uploadingImage ? 'Uploading...' : 'Upload Image'}
+                        </span>
+                      </div>
+                    </label>
+                    {!imagePreview && (
+                      <span className="text-xs text-gray-500">
+                        JPG, PNG up to 5MB
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 

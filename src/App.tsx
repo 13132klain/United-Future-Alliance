@@ -1,7 +1,9 @@
 import React from 'react';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
+import CursorTrail from './components/CursorTrail';
 import HomePage from './pages/HomePage';
+import AboutPage from './pages/AboutPage';
 import EventsPage from './pages/EventsPage';
 import LeadershipPage from './pages/LeadershipPage';
 import ResourcesPage from './pages/ResourcesPage';
@@ -41,28 +43,7 @@ function App() {
       case 'profile':
         return <ProfilePage onNavigate={setCurrentPage} />;
       case 'about':
-        return (
-          <div className="min-h-screen bg-gray-50 py-12">
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center mb-12">
-                <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">About UFA</h1>
-                <p className="text-xl text-gray-600">Learn more about our mission, vision, and commitment to Kenya's future.</p>
-              </div>
-              <div className="bg-white rounded-xl shadow-lg p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Our Story</h2>
-                <p className="text-gray-600 leading-relaxed mb-6">
-                  The United Future Alliance was founded in 2024 by a diverse group of Kenyan leaders, activists, and citizens 
-                  who shared a common vision: to build a more inclusive, progressive, and sustainable Kenya for all.
-                </p>
-                <p className="text-gray-600 leading-relaxed">
-                  We believe that through unity, innovation, and collective action, we can address the challenges facing our 
-                  nation and create opportunities for every Kenyan to thrive. Our movement is built on the principles of 
-                  transparency, accountability, and citizen participation in governance.
-                </p>
-              </div>
-            </div>
-          </div>
-        );
+        return <AboutPage />;
       case 'community':
         return <CommunityPage onNavigate={setCurrentPage} />;
       default:
@@ -73,6 +54,7 @@ function App() {
   return (
     <AuthProvider>
       <div className="min-h-screen flex flex-col">
+        <CursorTrail />
         <Header 
           currentPage={currentPage} 
           onNavigate={setCurrentPage} 

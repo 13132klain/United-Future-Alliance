@@ -2,6 +2,59 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Keep default cursor but add trail effects */
+
+/* Marker-style highlighting for section headings */
+.marker-highlight {
+  position: relative;
+  display: inline-block;
+}
+
+.marker-highlight::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -8px;
+  right: -8px;
+  bottom: 0;
+  background: linear-gradient(120deg, rgba(251, 191, 36, 0.3) 0%, rgba(251, 191, 36, 0.1) 100%);
+  transform: rotate(-1deg);
+  z-index: -1;
+  border-radius: 4px;
+}
+
+.marker-highlight::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -4px;
+  right: -4px;
+  bottom: 0;
+  background: linear-gradient(120deg, rgba(251, 191, 36, 0.2) 0%, rgba(251, 191, 36, 0.05) 100%);
+  transform: rotate(0.5deg);
+  z-index: -1;
+  border-radius: 2px;
+}
+
+/* Custom cursor trail animations */
+@keyframes cursorPulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+@keyframes cursorRotate {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
 /* Custom animations for hero section */
 @keyframes fade-in-up {
   from {

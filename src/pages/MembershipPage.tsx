@@ -299,7 +299,7 @@ export default function MembershipPage({ onNavigate }: MembershipPageProps) {
               </div>
             </div>
             <h1 className="text-2xl md:text-3xl font-bold mb-2">
-              Join UFA
+              <span className="marker-highlight">Join UFA</span>
             </h1>
             <p className="text-sm md:text-base text-green-100 max-w-2xl mx-auto">
               Become part of Kenya's most progressive political movement

@@ -39,6 +39,16 @@ let mockEvents: Event[] = [
     type: 'webinar',
     registrationRequired: true,
     image: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=800'
+  },
+  {
+    id: '3',
+    title: 'UFA Membership Recruitment',
+    description: 'UFA will be recruiting new members to the organization',
+    date: new Date('2025-09-20T17:00:00'),
+    location: 'SafariPark, Nairobi',
+    type: 'meeting',
+    registrationRequired: true,
+    image: 'https://images.pexels.com/photos/289737/pexels-photo-289737.jpeg?auto=compress&cs=tinysrgb&w=800'
   }
 ];
 
